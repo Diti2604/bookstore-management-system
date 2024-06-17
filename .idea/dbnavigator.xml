@@ -5,8 +5,8 @@
     <preferences />
   </component>
   <component name="DBNavigator.Project.DataEditorManager">
-    <record-view-column-sorting-type value="BY_INDEX" />
-    <value-preview-text-wrapping value="true" />
+    <record-view-column-sorting-type value="ALPHABETICAL" />
+    <value-preview-text-wrapping value="false" />
     <value-preview-pinned value="false" />
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
@@ -24,12 +24,15 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" object-ref="schemas/bookstore/tables/books" />
+    </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="80f744ff-f64a-40b3-992e-ef775a8439bd" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.books" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.users" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.bill_items" active-filter-id="" />
   </component>

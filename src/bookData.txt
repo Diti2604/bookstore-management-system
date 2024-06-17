@@ -1,0 +1,8 @@
+book1.jpg,Atomic Habits,Self-Improvement,1234-23-4321,James Clear,55, 40,40
+book2.jpg,Cant Hurt Me,Self-Improvement,5678-45-6789,John Doe,45,30,30
+book3.png,Yet Another Book,Fiction,9876-54-3210,Jane Smith,40,30,20
+book4.jpg,Atomic Habits,Self-Improvement,1234-23-4321,James Clear,45,35,40
+book5.jpg,Another Book,Mystery,5678-45-6789,John Doe,67,25,30
+book6.jpg,Yet Another Book,Fiction,9876-54-3210,Jane Smith,80,40,20
+book7.jpg,Atomic Habits,Self-Improvement,1234-23-4321,James Clear,48,35,40
+book8.jpg,Another Book,Mystery,5678-45-6789,John Doe,40,25,30
