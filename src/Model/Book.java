@@ -2,7 +2,6 @@ package Model;
 
 import javafx.scene.image.Image;
 
-import java.math.BigDecimal;
 import java.sql.Blob;
 
 public class Book {
@@ -24,8 +23,11 @@ public class Book {
         this.coverImage = coverImage;
     }
 
-    public Book() {
+    public Book(String title, String category, String isbn, String author, double price, int quantity) {
 
+    }
+
+    public Book(String title, int quantity, double bookTotalPrice) {
     }
 
     public String getISBN() {
