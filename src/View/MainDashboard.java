@@ -17,6 +17,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -27,6 +28,7 @@ import java.util.List;
 public class MainDashboard extends Application {
 
     private Connection conn;
+
 
     public static void main(String[] args) {
         launch(args);
@@ -41,8 +43,9 @@ public class MainDashboard extends Application {
 
             // Step 2: Establish Connection
             String url = "jdbc:mysql://localhost:3306/bookstore";
-            String user = "root";
-            String password = "HarveySpectre9";
+            String user = System.getenv("DB_USER");
+            String password = System.getenv("DB_PASSWORD");
+
             conn = DriverManager.getConnection(url, user, password);
 
             System.out.println("Connected to the database!");
