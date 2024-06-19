@@ -73,7 +73,6 @@ public class MainDashboardView extends Application {
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.TOP_CENTER);
 
-        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
         Rectangle headerRectangle = new Rectangle(screenBounds.getWidth(), 100, Color.BLACK);
 
         StackPane stackPane = new StackPane();
@@ -120,6 +119,8 @@ public class MainDashboardView extends Application {
         );
         actionComboBox.setStyle("-fx-font-size: 14pt; -fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;");
 
+
+
         VBox bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
         bookContainer.setSpacing(40);
@@ -129,6 +130,46 @@ public class MainDashboardView extends Application {
         for (VBox bookVBox : bookBoxes) {
             bookContainer.getChildren().add(bookVBox);
         }
+
+        switch (userRole) {
+            case "Librarian":
+                // Disable specific buttons for Librarian
+                actionComboBox.getItems().forEach(button -> {
+                    if (button.getText().equals("Check Librarian Performance") ||
+                            button.getText().equals("Book Statistics") ||
+                            button.getText().equals("Manage Employees") ||
+                            button.getText().equals("Total Cost")) {
+                        button.setDisable(true);
+                    }
+                });
+                break;
+            case "Manager":
+                // Disable specific buttons for Manager
+                actionComboBox.getItems().forEach(button -> {
+                    if (button.getText().equals("Manage Employees") ||
+                            button.getText().equals("Total Cost")) {
+                        button.setDisable(true);
+                    }
+                });
+                break;
+        }
+
+        actionComboBox.setCellFactory(param -> new ListCell<Button>() {
+            @Override
+            protected void updateItem(Button item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item.getText());
+                    setDisable(!isButtonEnabled(item));
+                    setStyle("-fx-opacity: " + (isButtonEnabled(item) ? "1.0;" : "0.5;") +
+                            "-fx-text-fill: " + (isButtonEnabled(item) ? "black;" : "grey;"));
+                } else {
+                    setText(null);
+                    setGraphic(null);
+                }
+            }
+        });
+
 
         int booksPerRow = 4;
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
@@ -238,5 +279,8 @@ public class MainDashboardView extends Application {
         }
 
         return bookBoxes;
+    }
+    private boolean isButtonEnabled(Button button) {
+        return !button.isDisabled();
     }
 }
