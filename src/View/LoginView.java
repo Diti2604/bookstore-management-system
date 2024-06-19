@@ -1,5 +1,6 @@
 package View;
 
+import Controller.LoginController;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,11 +14,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-
 public class LoginView extends Application {
+    private LoginController loginController;
 
     public static void main(String[] args) {
         launch(args);
@@ -25,6 +25,8 @@ public class LoginView extends Application {
 
     @Override
     public void start(Stage stage) {
+        loginController = new LoginController();
+
         Image image = new Image(getClass().getResource("/Assets/loginPicture.jpg").toExternalForm());
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
@@ -44,12 +46,16 @@ public class LoginView extends Application {
         loginButton.setOnMouseEntered(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: hand;"));
         loginButton.setOnMouseExited(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: pointer;"));
 
+        loginButton.setOnAction(event -> {
+            String username = usernameTextField.getText();
+            String password = passwordField.getText();
+            loginController.handleLogin(stage, username, password);
+        });
 
         VBox loginPane = new VBox();
         loginPane.setAlignment(Pos.CENTER);
         loginPane.setPadding(new Insets(15));
         loginPane.setSpacing(10);
-//        loginPane.setMaxWidth(300);
         loginPane.getChildren().addAll(usernameTextField, passwordField, loginButton);
 
         Rectangle rectangle = new Rectangle(300, 200);

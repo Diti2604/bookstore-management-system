@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -28,7 +29,15 @@ import java.util.List;
 public class MainDashboardView extends Application {
 
     private Connection conn;
+    private String userRole;
 
+    public MainDashboardView(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public MainDashboardView() {
+        // Default constructor for compatibility
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -36,12 +45,9 @@ public class MainDashboardView extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Attempt to establish a database connection
         try {
-            // Step 1: Load MySQL JDBC Driver
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            // Step 2: Establish Connection
             String url = "jdbc:mysql://localhost:3306/bookstore";
             String user = System.getenv("DB_USER");
             String password = System.getenv("DB_PASSWORD");
@@ -50,7 +56,6 @@ public class MainDashboardView extends Application {
 
             System.out.println("Connected to the database!");
 
-            // Launch your JavaFX GUI
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
@@ -63,16 +68,18 @@ public class MainDashboardView extends Application {
     }
 
     public void launchDashboard(Stage primaryStage) {
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.TOP_CENTER);
 
         double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-        Rectangle headerRectangle = new Rectangle(screenWidth, 100, Color.BLACK);
+        Rectangle headerRectangle = new Rectangle(screenBounds.getWidth(), 100, Color.BLACK);
 
         StackPane stackPane = new StackPane();
         stackPane.setAlignment(Pos.TOP_CENTER);
 
-        Text headerText = new Text("HOMEPAGE");
+        Text headerText = new Text("Welcome, " + userRole);
         headerText.setFont(Font.font("Times New Roman", 86));
         headerText.setFill(Color.WHITE);
 
@@ -163,12 +170,12 @@ public class MainDashboardView extends Application {
 
         vbox.getChildren().addAll(stackPane, hbox, scrollPane);
 
-        Scene librarianScene = new Scene(vbox, 800, 600);
-        primaryStage.setScene(librarianScene);
-        primaryStage.setTitle("Librarian View");
+        Scene scene = new Scene(vbox, screenBounds.getWidth(), screenBounds.getHeight());
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(userRole + " View");
 
-        primaryStage.setMaximized(true);
-        Platform.runLater(primaryStage::show);
+        primaryStage.setFullScreen(true);
+        primaryStage.show();
     }
 
     private Button createComboBoxButton(String text) {
