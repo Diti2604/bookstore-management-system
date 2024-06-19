@@ -120,7 +120,6 @@ public class MainDashboardView extends Application {
         actionComboBox.setStyle("-fx-font-size: 14pt; -fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;");
 
 
-
         VBox bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
         bookContainer.setSpacing(40);
@@ -133,7 +132,6 @@ public class MainDashboardView extends Application {
 
         switch (userRole) {
             case "Librarian":
-                // Disable specific buttons for Librarian
                 actionComboBox.getItems().forEach(button -> {
                     if (button.getText().equals("Check Librarian Performance") ||
                             button.getText().equals("Book Statistics") ||
@@ -144,7 +142,6 @@ public class MainDashboardView extends Application {
                 });
                 break;
             case "Manager":
-                // Disable specific buttons for Manager
                 actionComboBox.getItems().forEach(button -> {
                     if (button.getText().equals("Manage Employees") ||
                             button.getText().equals("Total Cost")) {
@@ -173,10 +170,10 @@ public class MainDashboardView extends Application {
 
         int booksPerRow = 4;
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
-            StackPane row = new StackPane(); // Use StackPane for centering
-            HBox booksHBox = new HBox(); // Use HBox for horizontal arrangement
-            booksHBox.setAlignment(Pos.CENTER); // Center books in the row
-            booksHBox.setSpacing(40);  // Adjust the spacing as needed
+            StackPane row = new StackPane();
+            HBox booksHBox = new HBox();
+            booksHBox.setAlignment(Pos.CENTER);
+            booksHBox.setSpacing(40);
 
             int booksInThisRow = Math.min(booksPerRow, bookBoxes.size() - i);
             for (int j = i; j < i + booksInThisRow; j++) {
@@ -280,6 +277,7 @@ public class MainDashboardView extends Application {
 
         return bookBoxes;
     }
+
     private boolean isButtonEnabled(Button button) {
         return !button.isDisabled();
     }

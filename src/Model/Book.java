@@ -2,8 +2,6 @@ package Model;
 
 import javafx.scene.image.Image;
 
-import java.sql.Blob;
-
 public class Book {
     private String ISBN;
     private String title;
@@ -23,13 +21,13 @@ public class Book {
         this.coverImage = coverImage;
     }
 
-    public Book(String title, String category, String isbn, String author, double price, int quantity) {
-
-    }
-
     public Book(String title, int quantity, double bookTotalPrice) {
+        this.title = title;
+        this.stock = quantity;
+        this.sellingPrice = bookTotalPrice;
     }
 
+    // Getters and setters
     public String getISBN() {
         return ISBN;
     }
@@ -82,7 +80,7 @@ public class Book {
         return coverImage;
     }
 
-    public void setCoverImage(Blob coverImage) {
-        this.coverImage = (Image) coverImage;
+    public void setCoverImage(Image coverImage) {
+        this.coverImage = coverImage;
     }
 }

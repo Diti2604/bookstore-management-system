@@ -25,16 +25,19 @@
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files>
-      <object connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" object-ref="schemas/bookstore/tables/users" />
+      <object connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" object-ref="schemas/bookstore/tables/printbill" />
     </open-files>
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="80f744ff-f64a-40b3-992e-ef775a8439bd" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.bill" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.printbill" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.books" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.users" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.bill_items" active-filter-id="" />
+    <filter-actions connection-id="80f744ff-f64a-40b3-992e-ef775a8439bd" dataset="bookstore.bills" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
