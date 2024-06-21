@@ -1,5 +1,5 @@
 package View;
-
+import Model.User;
 import Controller.CreateBillController;
 import Model.Book;
 import javafx.application.Application;
@@ -15,11 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import java.io.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Scanner;
 
 public class BillView extends Application {
     private Connection conn;
@@ -32,18 +28,32 @@ public class BillView extends Application {
     private TableView<Book> bookTableView;
     private ObservableList<Book> books;
     private CreateBillController createBillController;
+    private  String librarianUsername;
 
-    public BillView() throws IOException {
+    public BillView() {
         books = FXCollections.observableArrayList();
         createBillController = new CreateBillController();
+//       this.librarianUsername = librarianUsername;
     }
 
-    public static void main(String[] args) {
+//String username = getUsername();
+    public  void setLibrarianUsername(String username) {
+        this.librarianUsername = username;
+    }
+
+    public void main(String[] args) {
+        setLibrarianUsername("Librarian2");
         launch(args);
     }
 
     @Override
     public void start(Stage billStage) {
+        System.out.println("BillView started with librarianUsername: " + librarianUsername);
+
+
+//        if (librarianUsername == null) {
+//            throw new IllegalStateException("Librarian username must be set before launching the application");
+//        }
         billStage.setTitle("Create bill");
 
         double rectangleWidth = 400;
@@ -155,7 +165,6 @@ public class BillView extends Application {
         billStage.show();
     }
 
-
     private void processAddedBooks() {
         for (Book book : books) {
             String title = book.getTitle();
@@ -164,9 +173,11 @@ public class BillView extends Application {
 
             // Increment bill number and save bill data to the database
             billNumber++;
-            createBillController.saveBillToDatabase(title, quantity, totalPrice);
+            createBillController.saveBillToDatabase(librarianUsername, title, quantity, totalPrice);
         }
     }
+
+
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -174,6 +185,4 @@ public class BillView extends Application {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
-
 }

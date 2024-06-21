@@ -1,7 +1,6 @@
 package View;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -14,11 +13,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.w3c.dom.ls.LSOutput;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -27,12 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainDashboardView extends Application {
-
+    private String librarianUsername;
     private Connection conn;
     private String userRole;
 
-    public MainDashboardView(String userRole) {
+    public MainDashboardView(String userRole, String librarianUsername) {
         this.userRole = userRole;
+        this.librarianUsername = librarianUsername;
     }
 
     public MainDashboardView() {
@@ -40,22 +38,22 @@ public class MainDashboardView extends Application {
     }
 
     public static void main(String[] args) {
+        // Launch the JavaFX application
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
         try {
+            // Load JDBC driver and connect to the database
             Class.forName("com.mysql.cj.jdbc.Driver");
-
             String url = "jdbc:mysql://localhost:3306/bookstore";
             String user = System.getenv("DB_USER");
             String password = System.getenv("DB_PASSWORD");
-
             conn = DriverManager.getConnection(url, user, password);
-
             System.out.println("Connected to the database!");
 
+            // Launch the dashboard with the provided userRole and librarianUsername
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
@@ -119,6 +117,15 @@ public class MainDashboardView extends Application {
         );
         actionComboBox.setStyle("-fx-font-size: 14pt; -fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;");
 
+        actionComboBox.setOnAction(event -> {
+            Button selectedButton = actionComboBox.getValue();
+            if (selectedButton != null && selectedButton.getText().equals("Create Bill")) {
+                System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
+                BillView billView = new BillView();
+                billView.setLibrarianUsername(librarianUsername); // Pass librarianUsername to BillView
+                billView.start(new Stage());  // Start the BillView in a new Stage
+            }
+        });
 
         VBox bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
@@ -166,7 +173,6 @@ public class MainDashboardView extends Application {
                 }
             }
         });
-
 
         int booksPerRow = 4;
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
@@ -250,7 +256,7 @@ public class MainDashboardView extends Application {
                 VBox bookVBox = new VBox();
                 bookVBox.setSpacing(5);
                 bookVBox.setPadding(new Insets(10));
-                bookVBox.setAlignment(Pos.CENTER);
+                bookVBox.setAlignment                (Pos.CENTER);
 
                 Label isbnLabel = new Label("ISBN: " + isbn);
                 Label titleLabel = new Label("Title: " + title);
@@ -282,3 +288,4 @@ public class MainDashboardView extends Application {
         return !button.isDisabled();
     }
 }
+

@@ -47,6 +47,7 @@ public class LoginController {
 
                 switch (role) {
                     case "Librarian":
+                        String librarianUsername = rs.getString("username");
                         return new Librarian(username, password, name, birthday, phone, email, salary, role);
                     case "Manager":
                         return new Manager(username, password, name, birthday, phone, email, salary, role);
@@ -64,8 +65,8 @@ public class LoginController {
         User user = validateCredentials(username, password);
         if (user != null) {
             System.out.println("Login successful. Role: " + user.getRole());
-            MainDashboardView dashboardView = new MainDashboardView(user.getRole());
             try {
+                MainDashboardView dashboardView = new MainDashboardView(user.getRole(), username);
                 dashboardView.start(stage);
             } catch (Exception e) {
                 e.printStackTrace();

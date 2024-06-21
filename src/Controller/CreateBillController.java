@@ -64,14 +64,14 @@ public class CreateBillController {
             e.printStackTrace();
         }
     }
-
-    public void saveBillToDatabase(String title, int quantity, double totalPrice) {
+    public void saveBillToDatabase(String librarianUsername, String title, int quantity, double totalPrice) {
         try {
-            String query = "INSERT INTO printbill (book_title, quantity, total_price, created_at) VALUES (?, ?, ?, NOW())";
+            String query = "INSERT INTO bills (librarian_username, book_title, quantity, total_price, created_at) VALUES (?, ?, ?, ?, NOW())";
             PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, title);
-            pstmt.setInt(2, quantity);
-            pstmt.setDouble(3, totalPrice);
+            pstmt.setString(1, librarianUsername);
+            pstmt.setString(2, title);
+            pstmt.setInt(3, quantity);
+            pstmt.setDouble(4, totalPrice);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
