@@ -10,6 +10,7 @@ public class Book {
     private String author;
     private int stock;
     private Image coverImage;
+    private String url;
 
     public Book(String ISBN, String title, String category, double sellingPrice, String author, int stock, Image coverImage) {
         this.ISBN = ISBN;
@@ -25,6 +26,15 @@ public class Book {
         this.title = title;
         this.stock = quantity;
         this.sellingPrice = bookTotalPrice;
+    }
+
+    public Book(String url, String name, String category, String isbn, String author, double sellingPrice) {
+        this.url = url;
+        this.title = name;
+        this.category = category;
+        this.ISBN = isbn;
+        this.author = author;
+        this.sellingPrice = sellingPrice;
     }
 
     // Getters and setters
@@ -82,5 +92,13 @@ public class Book {
 
     public void setCoverImage(Image coverImage) {
         this.coverImage = coverImage;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
