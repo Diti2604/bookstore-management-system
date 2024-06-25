@@ -41,7 +41,7 @@ public class ManageEmployeesView extends Application {
 
         grid.add(actionLabel, 0, 0);
         ComboBox<String> actionComboBox = new ComboBox<>();
-        actionComboBox.getItems().addAll("Select", "Register", "Modify", "Delete", "Permissions");
+        actionComboBox.getItems().addAll("Select", "Register", "Modify", "Delete");
         actionComboBox.setValue("Select");
         grid.add(actionComboBox, 1, 0);
 
