@@ -38,7 +38,7 @@ public class ManageEmployeesController {
             return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return false;//
         }
     }
 
