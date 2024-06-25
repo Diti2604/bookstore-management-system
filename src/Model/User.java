@@ -1,10 +1,12 @@
 package Model;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 
-public abstract class User {
+public class User {
     protected String username;
-    protected String password;
+    private String hashedPassword;
     protected String name;
     protected LocalDate birthday;
     protected String phone;
@@ -14,7 +16,7 @@ public abstract class User {
 
     public User(String username, String password, String name, LocalDate birthday, String phone, String email, double salary, String role) {
         this.username = username;
-        this.password = password;
+        this.hashedPassword=hashPassword(password);
         this.name = name;
         this.birthday = birthday;
         this.phone = phone;
@@ -31,13 +33,7 @@ public abstract class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getName() {
         return name;
@@ -85,5 +81,33 @@ public abstract class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+    @Override
+    public String toString() {
+        return this.username;
+    }
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest(password.getBytes());
+
+            // Convert byte array to hexadecimal format
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            // Handle exception appropriately
+            return null;
+        }
+    }
+    public String getPassword() {
+        return hashedPassword;
+    }
+
+    public void setPassword(String password) {
+        this.hashedPassword = password;
     }
 }
