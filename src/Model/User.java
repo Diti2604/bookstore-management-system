@@ -1,5 +1,6 @@
 package Model;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -86,7 +87,7 @@ public class User {
     public String toString() {
         return this.username;
     }
-    private String hashPassword(String password) {
+    public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
@@ -103,6 +104,7 @@ public class User {
             return null;
         }
     }
+
     public String getPassword() {
         return hashedPassword;
     }

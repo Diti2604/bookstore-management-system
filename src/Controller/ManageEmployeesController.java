@@ -42,28 +42,6 @@ public class ManageEmployeesController {
         }
     }
 
-    public User getUser(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    String password = rs.getString("password");
-                    String name = rs.getString("name");
-                    LocalDate birthday = rs.getDate("birthday").toLocalDate();
-                    String phone = rs.getString("phone");
-                    String email = rs.getString("email");
-                    double salary = rs.getDouble("salary");
-                    String role = rs.getString("role");
-
-                    return new User(username, password, name, birthday, phone, email, salary, role);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public boolean deleteUser(String username) {
         String sql = "DELETE FROM users WHERE username = ?";
@@ -78,29 +56,7 @@ public class ManageEmployeesController {
         }
     }
 
-    public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM users";
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-                String name = rs.getString("name");
-                LocalDate birthday = rs.getDate("birthday").toLocalDate();
-                String phone = rs.getString("phone");
-                String email = rs.getString("email");
-                double salary = rs.getDouble("salary");
-                String role = rs.getString("role");
 
-                User user = new User(username, password, name, birthday, phone, email, salary, role);
-                users.add(user);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return users;
-    }
     public List<User> getUsersByRole(String role) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users WHERE role = ?";
