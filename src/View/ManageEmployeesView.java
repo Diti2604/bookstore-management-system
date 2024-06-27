@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ManageEmployeesView extends Application {
     private ManageEmployeesController controller;
@@ -128,7 +129,8 @@ public class ManageEmployeesView extends Application {
         TextField salaryTextField = new TextField();
 
         Label roleLabel = new Label("Role:");
-        TextField roleTextField = new TextField();
+        ComboBox<String> roleComboBox = new ComboBox<>();
+        roleComboBox.getItems().addAll("manager", "administrator", "librarian");
 
         Button registerButton = new Button("Register");
 
@@ -140,7 +142,7 @@ public class ManageEmployeesView extends Application {
                 phoneLabel, phoneTextField,
                 emailLabel, emailTextField,
                 salaryLabel, salaryTextField,
-                roleLabel, roleTextField,
+                roleLabel, roleComboBox,
                 registerButton
         );
 
@@ -151,8 +153,36 @@ public class ManageEmployeesView extends Application {
             LocalDate birthday = birthdayDatePicker.getValue();
             String phone = phoneTextField.getText();
             String email = emailTextField.getText();
-            double salary = Double.parseDouble(salaryTextField.getText());
-            String role = roleTextField.getText();
+            String salaryStr = salaryTextField.getText();
+            String role = roleComboBox.getValue();
+
+            if (!Pattern.matches("^[a-zA-Z0-9]+$", username)) {
+                showAlert("Invalid Username", "Username should only contain letters and numbers.");
+                return;
+            }
+            if (!Pattern.matches("^[a-zA-Z0-9]+$", password)) {
+                showAlert("Invalid Password", "Password should only contain letters and numbers.");
+                return;
+            }
+            if (!Pattern.matches("^[a-zA-Z]+$", name)) {
+                showAlert("Invalid Name", "Name should only contain letters.");
+                return;
+            }
+            if (!Pattern.matches("^\\d{10}$", phone)) {
+                showAlert("Invalid Phone", "Phone should only contain 10 digits.");
+                return;
+            }
+            if (!Pattern.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$", email)) {
+                showAlert("Invalid Email", "Email should be a valid Gmail address.");
+                return;
+            }
+            if (!Pattern.matches("^\\d+(\\.\\d+)?$", salaryStr)) {
+                showAlert("Invalid Salary", "Salary should only contain numbers.");
+                return;
+            }
+
+            double salary = Double.parseDouble(salaryStr);
+
 
             // Create a new User object
             User user = new User(username, password, name, birthday, phone, email, salary, role);
@@ -214,8 +244,9 @@ public class ManageEmployeesView extends Application {
                 salaryTextField.setText(String.valueOf(selectedUser.getSalary()));
 
                 Label roleLabel = new Label("Role:");
-                TextField roleTextField = new TextField();
-                roleTextField.setText(selectedUser.getRole());
+                ComboBox<String> roleComboBox = new ComboBox<>();
+                roleComboBox.getItems().addAll("manager", "administrator", "librarian");
+                roleComboBox.setValue(selectedUser.getRole());
 
                 Label newUsernameLabel = new Label("New Username:");
                 TextField newUsernameTextField = new TextField();
@@ -231,7 +262,7 @@ public class ManageEmployeesView extends Application {
                         phoneLabel, phoneTextField,
                         emailLabel, emailTextField,
                         salaryLabel, salaryTextField,
-                        roleLabel, roleTextField,
+                        roleLabel, roleComboBox,
                         newUsernameLabel, newUsernameTextField,
                         updateButton
                 );
@@ -244,8 +275,36 @@ public class ManageEmployeesView extends Application {
                     LocalDate newBirthday = birthdayDatePicker.getValue();
                     String newPhone = phoneTextField.getText();
                     String newEmail = emailTextField.getText();
-                    double newSalary = Double.parseDouble(salaryTextField.getText());
-                    String newRole = roleTextField.getText();
+                    String newSalaryStr = salaryTextField.getText();
+                    String newRole = roleComboBox.getValue();
+
+                    if (!Pattern.matches("^[a-zA-Z0-9]+$", newPassword)) {
+                        showAlert("Invalid Password", "Password should only contain letters and numbers.");
+                        return;
+                    }
+                    if (!Pattern.matches("^[a-zA-Z]+$", newName)) {
+                        showAlert("Invalid Name", "Name should only contain letters.");
+                        return;
+                    }
+                    if (!Pattern.matches("^\\d{10}$", newPhone)) {
+                        showAlert("Invalid Phone", "Phone should only contain 10 digits.");
+                        return;
+                    }
+                    if (!Pattern.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$", newEmail)) {
+                        showAlert("Invalid Email", "Email should be a valid Gmail address.");
+                        return;
+                    }
+                    if (!Pattern.matches("^\\d+(\\.\\d+)?$", newSalaryStr)) {
+                        showAlert("Invalid Salary", "Salary should only contain numbers.");
+                        return;
+                    }
+                    if (!Pattern.matches("^[a-zA-Z0-9]+$", newUsername)) {
+                        showAlert("Invalid Username", "Username should only contain letters and numbers.");
+                        return;
+                    }
+
+                    double newSalary = Double.parseDouble(newSalaryStr);
+
 
                     User updatedUser = new User(newUsername, newPassword, newName, newBirthday, newPhone, newEmail, newSalary, newRole);
 
