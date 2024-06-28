@@ -24,7 +24,7 @@ public class TotalCostView extends Application {
 
     @Override
     public void start(Stage stage) {
-        totalCostController = new TotalCostController(); // Instantiate controller
+        totalCostController = new TotalCostController();
 
         tableView = createTableView();
         timeframeComboBox = createTimeframeComboBox();
@@ -40,7 +40,6 @@ public class TotalCostView extends Application {
             double totalEmployeeCost = totalAdminSalary + totalManagerSalary + totalLibrarianSalary;
             double totalCost = totalEmployeeCost + totalBookCostWithTax;
 
-            // Update table with new data
             ObservableList<CostItem> data = FXCollections.observableArrayList(
                     new CostItem("Total Administrator Costs", totalAdminSalary),
                     new CostItem("Total Manager Costs", totalManagerSalary),
@@ -79,7 +78,7 @@ public class TotalCostView extends Application {
     private ComboBox<String> createTimeframeComboBox() {
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("Daily", "Weekly", "Monthly", "Yearly");
-        comboBox.setValue("Daily"); // Default value
+        comboBox.setValue("Daily");
         return comboBox;
     }
 

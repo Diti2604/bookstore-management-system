@@ -29,14 +29,12 @@ public class AddBookController {
         System.out.println("Saving book to database: " + book.getTitle());
 
         try {
-            // Check if the book already exists based on title
             String checkBookSQL = "SELECT stock FROM books WHERE title = ?";
             PreparedStatement checkStatement = conn.prepareStatement(checkBookSQL);
             checkStatement.setString(1, book.getTitle());
             ResultSet resultSet = checkStatement.executeQuery();
 
             if (resultSet.next()) {
-                // Book exists, update the stock
                 int currentStock = resultSet.getInt("stock");
                 int newStock = currentStock + 1;
 
@@ -48,7 +46,6 @@ public class AddBookController {
 
                 if (rowsAffected > 0) {
                     System.out.println("Stock updated successfully!");
-                    // Show alert for successful update
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Success");
@@ -58,19 +55,17 @@ public class AddBookController {
                     });
                 } else {
                     System.out.println("Failed to update the stock.");
-                    // Show alert for failure (if needed)
                 }
 
             } else {
-                // Book does not exist, insert a new record
                 String insertBookSQL = "INSERT INTO books (isbn, title, category, selling_price, author, stock, cover_image) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement insertStatement = conn.prepareStatement(insertBookSQL);
                 insertStatement.setString(1, book.getISBN());
                 insertStatement.setString(2, book.getTitle());
-                insertStatement.setString(3, book.getCategory()); // Insert category into database
+                insertStatement.setString(3, book.getCategory());
                 insertStatement.setDouble(4, book.getSellingPrice());
                 insertStatement.setString(5, book.getAuthor());
-                insertStatement.setInt(6, 1); // Set stock to 1
+                insertStatement.setInt(6, 1);
                 insertStatement.setString(7, book.getUrl());
 
                 int rowsAffected = insertStatement.executeUpdate();
@@ -91,7 +86,7 @@ public class AddBookController {
             PreparedStatement checkStatement = conn.prepareStatement(checkBookSQL);
             checkStatement.setString(1, title);
             ResultSet resultSet = checkStatement.executeQuery();
-            return resultSet.next(); // true if book with this title exists
+            return resultSet.next();
         } catch (SQLException e) {
             System.out.println("Error checking book existence: " + e.getMessage());
             return false;

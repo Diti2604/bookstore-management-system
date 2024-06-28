@@ -33,10 +33,8 @@ public class BillView extends Application {
     public BillView() {
         books = FXCollections.observableArrayList();
         createBillController = new CreateBillController();
-//       this.librarianUsername = librarianUsername;
     }
 
-//String username = getUsername();
     public  void setLibrarianUsername(String username) {
         this.librarianUsername = username;
     }
@@ -51,9 +49,6 @@ public class BillView extends Application {
         System.out.println("BillView started with librarianUsername: " + librarianUsername);
 
 
-//        if (librarianUsername == null) {
-//            throw new IllegalStateException("Librarian username must be set before launching the application");
-//        }
         billStage.setTitle("Create bill");
 
         double rectangleWidth = 400;
@@ -109,7 +104,6 @@ public class BillView extends Application {
             if (book != null) {
                 quantityField.setDisable(false);
                 quantityField.setText("0");
-//                showAlert("ISBN found", "Enter the quantity you want to purchase.");
             } else {
                 showAlert("ISBN not found", "The entered ISBN does not exist in the book data.");
             }
@@ -171,7 +165,6 @@ public class BillView extends Application {
             int quantity = book.getStock();
             double totalPrice = book.getSellingPrice();
 
-            // Increment bill number and save bill data to the database
             billNumber++;
             createBillController.saveBillToDatabase(librarianUsername, title, quantity, totalPrice);
         }

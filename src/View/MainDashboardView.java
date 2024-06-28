@@ -34,18 +34,15 @@ public class MainDashboardView extends Application {
     }
 
     public MainDashboardView() {
-        // Default constructor for compatibility
     }
 
     public static void main(String[] args) {
-        // Launch the JavaFX application
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Load JDBC driver and connect to the database
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
             String user = System.getenv("DB_USER");
@@ -53,7 +50,6 @@ public class MainDashboardView extends Application {
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the database!");
 
-            // Launch the dashboard with the provided userRole and librarianUsername
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
@@ -122,8 +118,8 @@ public class MainDashboardView extends Application {
             if (selectedButton != null && selectedButton.getText().equals("Create Bill")) {
                 System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
                 BillView billView = new BillView();
-                billView.setLibrarianUsername(librarianUsername); // Pass librarianUsername to BillView
-                billView.start(new Stage());  // Start the BillView in a new Stage
+                billView.setLibrarianUsername(librarianUsername);
+                billView.start(new Stage());
             }
         });
 
@@ -246,13 +242,11 @@ public class MainDashboardView extends Application {
                 String author = rs.getString("author");
                 int stock = rs.getInt("stock");
 
-                // Example: Load cover image from database blob (assuming it's stored as blob)
                 Blob coverImageBlob = rs.getBlob("cover_image");
                 byte[] imageData = coverImageBlob.getBytes(1, (int) coverImageBlob.length());
                 InputStream inputStream = new ByteArrayInputStream(imageData);
                 Image coverImage = new Image(inputStream);
 
-                // For demo purposes, create a basic VBox for each book
                 VBox bookVBox = new VBox();
                 bookVBox.setSpacing(5);
                 bookVBox.setPadding(new Insets(10));
@@ -263,14 +257,12 @@ public class MainDashboardView extends Application {
                 Label categoryLabel = new Label("Category: " + category);
                 Label authorLabel = new Label("Author: " + author);
 
-                // Display cover image
                 ImageView imageView = new ImageView(coverImage);
                 imageView.setFitWidth(150);
                 imageView.setFitHeight(200);
 
                 bookVBox.getChildren().addAll(isbnLabel, titleLabel, categoryLabel, authorLabel, imageView);
 
-                // Add bookVBox to the list of book boxes
                 bookBoxes.add(bookVBox);
             }
 

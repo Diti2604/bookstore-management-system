@@ -29,12 +29,10 @@ public class BookStatisticsView extends Application {
     public void start(Stage stage) {
         statisticsController = new BookStatisticsController();
 
-        // Create VBox layout
         VBox vbox = new VBox(20);
         vbox.setAlignment(Pos.TOP_CENTER);
         vbox.setPadding(new Insets(20));
 
-        // Create header
         double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
         Rectangle headerRectangle = new Rectangle(screenWidth, 140);
         headerRectangle.setFill(Color.DARKBLUE);
@@ -48,7 +46,6 @@ public class BookStatisticsView extends Application {
 
         stackPane.getChildren().addAll(headerRectangle, headerText);
 
-        // Create statistics Box
         VBox statisticsBox = new VBox(10);
         statisticsBox.setAlignment(Pos.CENTER);
         statisticsBox.setPadding(new Insets(20));

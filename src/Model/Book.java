@@ -53,7 +53,6 @@ public class Book {
     }
 
 
-    // Getters and setters
     public String getISBN() {
         return ISBN;
     }

@@ -26,7 +26,6 @@ public class CheckLibrarianPerformanceController {
     }
 
 
-    // Method to fetch all librarians from the database
     public ObservableList<String> fetchLibrariansFromDatabase() {
         ObservableList<String> librarianUsernames = FXCollections.observableArrayList();
         PreparedStatement pstmt = null;

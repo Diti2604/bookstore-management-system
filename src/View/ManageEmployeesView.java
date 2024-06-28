@@ -56,7 +56,6 @@ public class ManageEmployeesView extends Application {
         librarianComboBox.setVisible(false);
 
 
-        // Fetch and populate ComboBoxes with managers and librarians
         List<User> managers = controller.getUsersByRole("manager");
         List<User> librarians = controller.getUsersByRole("librarian");
 
@@ -83,13 +82,13 @@ public class ManageEmployeesView extends Application {
             if ("Modify".equals(selectedAction)) {
                 managerComboBox.setVisible(true);
                 librarianComboBox.setVisible(true);
-                showModifyForm(dataContainer); // Example: Show modify form
+                showModifyForm(dataContainer);
             } else if ("Register".equals(selectedAction)) {
-                showRegistrationForm(dataContainer); // Example: Show registration form
+                showRegistrationForm(dataContainer);
             } else if ("Delete".equals(selectedAction)) {
-                showDeleteOptions(dataContainer); // Example: Show delete options
+                showDeleteOptions(dataContainer);
             } else {
-                dataContainer.getChildren().clear(); // Clear data container for other actions
+                dataContainer.getChildren().clear();
                 managerComboBox.setVisible(false);
                 librarianComboBox.setVisible(false);
             }
@@ -184,10 +183,8 @@ public class ManageEmployeesView extends Application {
             double salary = Double.parseDouble(salaryStr);
 
 
-            // Create a new User object
             User user = new User(username, password, name, birthday, phone, email, salary, role);
 
-            // Call the registerEmployee method in the controller
             boolean success = controller.registerEmployee(user);
 
             if (success) {
@@ -213,7 +210,6 @@ public class ManageEmployeesView extends Application {
             User selectedUser = userComboBox.getValue();
 
             if (selectedUser != null) {
-                // Display user details for modification
                 dataContainer.getChildren().clear();
 
                 Label usernameLabel = new Label("Username:");
@@ -268,7 +264,6 @@ public class ManageEmployeesView extends Application {
                 );
 
                 updateButton.setOnAction(event -> {
-                    // Update user with modified details
                     String newUsername = newUsernameTextField.getText();
                     String newPassword = passwordField.getText();
                     String newName = nameTextField.getText();

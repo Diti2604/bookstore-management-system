@@ -38,7 +38,7 @@ public class ManageEmployeesController {
             return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;//
+            return false;
         }
     }
 
@@ -72,7 +72,6 @@ public class ManageEmployeesController {
                 String email = rs.getString("email");
                 double salary = rs.getDouble("salary");
 
-                // Create User object and add to list
                 User user = new User(username, password, name, birthday, phone, email, salary, role);
                 users.add(user);
             }
@@ -86,7 +85,7 @@ public class ManageEmployeesController {
                 "birthday = ?, phone = ?, email = ?, salary = ?, role = ? " +
                 "WHERE username = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, user.getUsername());  // New username
+            stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getPassword());
             stmt.setString(3, user.getName());
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
@@ -94,7 +93,7 @@ public class ManageEmployeesController {
             stmt.setString(6, user.getEmail());
             stmt.setDouble(7, user.getSalary());
             stmt.setString(8, user.getRole());
-            stmt.setString(9, currentUsername);  // Current username to identify the user to update
+            stmt.setString(9, currentUsername);
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;

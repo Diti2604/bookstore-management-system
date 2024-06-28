@@ -42,16 +42,12 @@ public class AddBookView extends Application {
 
     private static final String ISBN_REGEX = "\\d{4}-\\d{2}-\\d{4}";
 
-    //    categoryComboBox = new ComboBox<>();
     List<String> bookCategories = Arrays.asList(
             "Fantasy", "Science Fiction", "Mystery", "Thriller", "Romance",
             "Biography", "Memoir", "History", "Self-help", "Cookbooks",
             "Young Adult", "Children's Books", "Poetry", "Drama/Plays",
             "Horror", "Travel", "Graphic Novels/Comics", "Science"
     );
-//       categoryComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-//        // Handle category selection if needed
-//    });
 
     public static void main(String[] args) {
         launch(args);
@@ -78,7 +74,7 @@ public class AddBookView extends Application {
             if (event.getCode() == KeyCode.ENTER) {
                 String pictureBookUrl = bookUrlField.getText();
                 if (!pictureBookUrl.isEmpty()) {
-                    imageUrl = pictureBookUrl; // Set the imageUrl from text field
+                    imageUrl = pictureBookUrl;
                     Image image = new Image(pictureBookUrl);
                     imageView.setImage(image);
                 }
@@ -95,7 +91,7 @@ public class AddBookView extends Application {
         searchButton = new Button("Search");
         searchButton.setStyle("-fx-font-family: 'Times New Roman'; -fx-font-weight: bold; -fx-background-radius: 15; -fx-border-radius: 15;");
         searchButton.setOnAction(e -> handleSearch());
-        grid.add(searchButton, 2, 1); // Add search button next to bookNameField
+        grid.add(searchButton, 2, 1);
 
 
         Label categoryLabel = new Label("Category: ");
@@ -158,7 +154,7 @@ public class AddBookView extends Application {
         fileChooser.setTitle("Choose Book Image");
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            imageUrl = file.toURI().toString();  // Store the image URL
+            imageUrl = file.toURI().toString();
             Image image = new Image(imageUrl);
             imageView.setImage(image);
         }
@@ -167,7 +163,6 @@ public class AddBookView extends Application {
     private void handleSubmit() {
         System.out.println("Submit button clicked.");
 
-        // Retrieve input values
         String url = imageUrl != null ? imageUrl : bookUrlField.getText();
         String name = bookNameField.getText();
         String category = categoryComboBox.getValue();
@@ -182,22 +177,17 @@ public class AddBookView extends Application {
             return;
         }
 
-        // Validate ISBN format
         if (!validateISBN(isbn)) {
             showAlert(Alert.AlertType.ERROR, "Error", "Invalid Input", "ISBN format is incorrect. Expected format: XXXX-XX-XXXX.");
             return;
         }
 
-        // Create book object
         Book book = new Book(url, name, category, isbn, author, sellingPrice);
 
-        // Check if book already exists by name
         boolean bookExists = addBookController.bookExistsByName(name);
 
-        // Save or update book based on existence
         addBookController.saveBook(book);
 
-        // Clear fields and show success message
         clearFields();
         showAlert(Alert.AlertType.INFORMATION, "Success", "Book Saved", "Book saved successfully and fields cleared.");
     }
@@ -210,7 +200,7 @@ public class AddBookView extends Application {
     private void clearFields() {
         bookUrlField.clear();
         bookNameField.clear();
-        categoryComboBox.getSelectionModel().clearSelection(); // Clear selected category
+        categoryComboBox.getSelectionModel().clearSelection();
         isbnField.clear();
         authorField.clear();
         sellingPriceField.clear();
@@ -223,26 +213,20 @@ public class AddBookView extends Application {
         if (!title.isEmpty()) {
             Book existingBook = addBookController.getBookByName(title);
             if (existingBook != null) {
-                // Book found, auto-fill other fields
                 bookUrlField.setText(existingBook.getUrl());
-                categoryComboBox.setValue(existingBook.getCategory()); // Set category in ComboBox
+                categoryComboBox.setValue(existingBook.getCategory());
                 authorField.setText(existingBook.getAuthor());
                 sellingPriceField.setText(String.valueOf(existingBook.getSellingPrice()));
-                // Optionally, set ISBN field if needed
-//            isbnField.setText(existingBook.getISBN());
 
-                // Optionally, load and display image if you have image URL stored
                 String imageUrl = existingBook.getUrl();
                 if (imageUrl != null && !imageUrl.isEmpty()) {
                     Image image = new Image(imageUrl);
                     imageView.setImage(image);
                 }
             } else {
-                // Book not found, show alert to user
                 showAlert(Alert.AlertType.ERROR, "Error", "Book Not Found", "Book with title '" + title + "' not found in the database.");
             }
         } else {
-            // Handle case where title field is empty
             showAlert(Alert.AlertType.WARNING, "Warning", "Empty Field", "Please enter a book title to search.");
         }
     }

@@ -130,7 +130,7 @@ public class TotalCostController {
             totalBookCost += book.getSellingPrice();
         }
 
-        double taxRate = 0.2; // 20% tax rate
+        double taxRate = 0.2;
         double totalBookCostWithTax = totalBookCost * (1 + taxRate);
         return totalBookCostWithTax;
     }
