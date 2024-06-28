@@ -37,6 +37,22 @@ public class Book {
         this.sellingPrice = sellingPrice;
     }
 
+    public Book(String isbn, String title, String author, double price) {
+        this.ISBN = isbn;
+        this.title = title;
+        this.author = author;
+        this.sellingPrice = price;
+    }
+
+    public Book(String isbn, String title, String author, double price, int stock) {
+        this.ISBN = isbn;
+        this.title = title;
+        this.author = author;
+        this.sellingPrice = price;
+        this.stock = stock;
+    }
+
+
     // Getters and setters
     public String getISBN() {
         return ISBN;
