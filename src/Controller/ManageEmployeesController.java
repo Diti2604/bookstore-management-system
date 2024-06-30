@@ -1,5 +1,7 @@
 package Controller;
 import Model.User;
+import javafx.scene.control.Alert;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,6 +24,10 @@ public class ManageEmployeesController {
     }
 
     public boolean registerEmployee(User user) {
+        if (isUsernameExists(user.getUsername())) {
+            showAlert("Duplicate Username", "Username '" + user.getUsername() + "' already exists.");
+            return false; // Exit registration process
+        }
         String sql = "INSERT INTO users (username, password, name, birthday, phone, email, salary, role) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -101,5 +107,26 @@ public class ManageEmployeesController {
             e.printStackTrace();
             return false;
         }
+    }
+    private boolean isUsernameExists(String username) {
+        String sql = "SELECT COUNT(*) AS count FROM users WHERE username = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt("count");
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

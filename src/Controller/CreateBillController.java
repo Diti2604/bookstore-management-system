@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import java.io.ByteArrayInputStream;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateBillController {
     private Connection conn;
@@ -76,6 +78,22 @@ public class CreateBillController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> getAllISBNsOrderedByStock() {
+        List<String> isbns = new ArrayList<>();
+        try {
+            String query = "SELECT ISBN FROM books ORDER BY stock DESC";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                isbns.add(rs.getString("ISBN"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isbns;
     }
 }
 

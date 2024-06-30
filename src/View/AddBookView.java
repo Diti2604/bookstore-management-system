@@ -41,6 +41,7 @@ public class AddBookView extends Application {
     private Button searchButton;
 
     private static final String ISBN_REGEX = "\\d{4}-\\d{2}-\\d{4}";
+    private static final String AUTHOR_REGEX = "^[a-zA-Z\\s]+$"; // Only letters and spaces
 
     List<String> bookCategories = Arrays.asList(
             "Fantasy", "Science Fiction", "Mystery", "Thriller", "Romance",
@@ -93,13 +94,11 @@ public class AddBookView extends Application {
         searchButton.setOnAction(e -> handleSearch());
         grid.add(searchButton, 2, 1);
 
-
         Label categoryLabel = new Label("Category: ");
         categoryComboBox = new ComboBox<>(FXCollections.observableArrayList(bookCategories));
         categoryComboBox.setPromptText("Select Category");
         grid.add(categoryLabel, 0, 2);
         grid.add(categoryComboBox, 1, 2);
-
 
         Label isbnLabel = new Label("ISBN: ");
         isbnField = new TextField();
@@ -182,6 +181,11 @@ public class AddBookView extends Application {
             return;
         }
 
+        if (!validateAuthor(author)) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid Input", "Author name must contain only letters and spaces.");
+            return;
+        }
+
         Book book = new Book(url, name, category, isbn, author, sellingPrice);
 
         boolean bookExists = addBookController.bookExistsByName(name);
@@ -192,9 +196,12 @@ public class AddBookView extends Application {
         showAlert(Alert.AlertType.INFORMATION, "Success", "Book Saved", "Book saved successfully and fields cleared.");
     }
 
-
     private boolean validateISBN(String isbn) {
         return isbn.matches(ISBN_REGEX);
+    }
+
+    private boolean validateAuthor(String author) {
+        return author.matches(AUTHOR_REGEX);
     }
 
     private void clearFields() {
@@ -215,6 +222,7 @@ public class AddBookView extends Application {
             if (existingBook != null) {
                 bookUrlField.setText(existingBook.getUrl());
                 categoryComboBox.setValue(existingBook.getCategory());
+//                isbnField.setText(existingBook.getISBN());
                 authorField.setText(existingBook.getAuthor());
                 sellingPriceField.setText(String.valueOf(existingBook.getSellingPrice()));
 
@@ -238,6 +246,4 @@ public class AddBookView extends Application {
         alert.setContentText(contentText);
         alert.showAndWait();
     }
-
-
 }

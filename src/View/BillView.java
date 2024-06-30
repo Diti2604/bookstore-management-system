@@ -1,4 +1,5 @@
 package View;
+
 import Model.User;
 import Controller.CreateBillController;
 import Model.Book;
@@ -16,6 +17,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
+import java.util.List;
 
 public class BillView extends Application {
     private Connection conn;
@@ -28,14 +30,14 @@ public class BillView extends Application {
     private TableView<Book> bookTableView;
     private ObservableList<Book> books;
     private CreateBillController createBillController;
-    private  String librarianUsername;
+    private String librarianUsername;
 
     public BillView() {
         books = FXCollections.observableArrayList();
         createBillController = new CreateBillController();
     }
 
-    public  void setLibrarianUsername(String username) {
+    public void setLibrarianUsername(String username) {
         this.librarianUsername = username;
     }
 
@@ -47,7 +49,6 @@ public class BillView extends Application {
     @Override
     public void start(Stage billStage) {
         System.out.println("BillView started with librarianUsername: " + librarianUsername);
-
 
         billStage.setTitle("Create bill");
 
@@ -63,9 +64,12 @@ public class BillView extends Application {
         grid.setPadding(new Insets(20, 20, 20, 20));
 
         Label isbnLabel = new Label("Isbn: ");
-        TextField isbnField = new TextField();
+        ComboBox<String> isbnComboBox = new ComboBox<>();
+        List<String> isbns = createBillController.getAllISBNsOrderedByStock();
+        isbnComboBox.setItems(FXCollections.observableArrayList(isbns));
+
         grid.add(isbnLabel, 0, 0);
-        grid.add(isbnField, 1, 0);
+        grid.add(isbnComboBox, 1, 0);
 
         Label quantityLabel = new Label("Quantity: ");
         TextField quantityField = new TextField("0");
@@ -98,7 +102,7 @@ public class BillView extends Application {
 
         Button loadBookButton = new Button("Load Book Info");
         loadBookButton.setOnAction(e -> {
-            String isbn = isbnField.getText();
+            String isbn = isbnComboBox.getValue();
             Book book = createBillController.getBookByISBN(isbn);
 
             if (book != null) {
@@ -111,11 +115,16 @@ public class BillView extends Application {
 
         Button addBookButton = new Button("Add Book");
         addBookButton.setOnAction(e -> {
-            String isbn = isbnField.getText();
+            String isbn = isbnComboBox.getValue();
             Book book = createBillController.getBookByISBN(isbn);
 
             if (book != null) {
-                int quantity = Integer.parseInt(quantityField.getText());
+                String quantityText = quantityField.getText();
+                if (!quantityText.matches("\\d+")) {
+                    showAlert("Invalid Quantity", "Please enter a valid numeric quantity.");
+                    return;
+                }
+                int quantity = Integer.parseInt(quantityText);
                 if (quantity > book.getStock()) {
                     showAlert("Insufficient Stock", "The available stock is less than the requested quantity.");
                     return;
@@ -128,7 +137,7 @@ public class BillView extends Application {
 
                 createBillController.updateBookStock(isbn, (book.getStock() - quantity));
 
-                isbnField.clear();
+                isbnComboBox.setValue(null);
                 quantityField.clear();
                 quantityField.setDisable(true);
             } else {
@@ -169,8 +178,6 @@ public class BillView extends Application {
             createBillController.saveBillToDatabase(librarianUsername, title, quantity, totalPrice);
         }
     }
-
-
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING);

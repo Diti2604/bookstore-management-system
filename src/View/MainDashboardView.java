@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -115,14 +116,45 @@ public class MainDashboardView extends Application {
 
         actionComboBox.setOnAction(event -> {
             Button selectedButton = actionComboBox.getValue();
-            if (selectedButton != null && selectedButton.getText().equals("Create Bill")) {
-                System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
-                BillView billView = new BillView();
-                billView.setLibrarianUsername(librarianUsername);
-                billView.start(new Stage());
+            if (selectedButton != null) {
+                Stage newStage = new Stage();
+                newStage.initModality(Modality.APPLICATION_MODAL);
+                newStage.initOwner(primaryStage);
+
+                switch (selectedButton.getText()) {
+                    case "Create Bill":
+                        System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
+                        BillView billView = new BillView();
+                        billView.setLibrarianUsername(librarianUsername);
+                        billView.start(newStage);
+                        break;
+                    case "Add Book":
+                        System.out.println("Opening Add Book Section");
+                        AddBookView addBookView = new AddBookView();
+                        addBookView.start(newStage);
+                        break;
+                    case "Check Librarian Performance":
+                        System.out.println("Opening Check Librarian Performance Section");
+                        CheckLibrarianPerformanceView checkLibrarianPerformanceView = new CheckLibrarianPerformanceView();
+                        checkLibrarianPerformanceView.start(newStage);
+                        break;
+                    case "Book Statistics":
+                        System.out.println("Opening Book Statistics Section");
+                        BookStatisticsView bookStatisticsView = new BookStatisticsView();
+                        bookStatisticsView.start(newStage);
+                        break;
+                    case "Manage Employees":
+                        System.out.println("Opening Manage Employees Section");
+                        ManageEmployeesView manageEmployeesView = new ManageEmployeesView();
+                        manageEmployeesView.start(newStage);
+                        break;
+                    case "Total Cost":
+                        TotalCostView totalCostView = new TotalCostView();
+                        totalCostView.start(newStage);
+                        break;
+                }
             }
         });
-
         VBox bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
         bookContainer.setSpacing(40);
@@ -250,7 +282,7 @@ public class MainDashboardView extends Application {
                 VBox bookVBox = new VBox();
                 bookVBox.setSpacing(5);
                 bookVBox.setPadding(new Insets(10));
-                bookVBox.setAlignment                (Pos.CENTER);
+                bookVBox.setAlignment(Pos.CENTER);
 
                 Label isbnLabel = new Label("ISBN: " + isbn);
                 Label titleLabel = new Label("Title: " + title);
