@@ -1,10 +1,8 @@
 package View;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
+import javafx.application.Platform;
+import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -13,13 +11,12 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +25,8 @@ public class MainDashboardView extends Application {
     private String librarianUsername;
     private Connection conn;
     private String userRole;
+    private VBox bookContainer = new VBox();
+    private List<VBox> originalBooks;
 
     public MainDashboardView(String userRole, String librarianUsername) {
         this.userRole = userRole;
@@ -51,6 +50,7 @@ public class MainDashboardView extends Application {
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the database!");
 
+            originalBooks = fetchBooksFromDatabase("", "Title");
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
@@ -91,9 +91,16 @@ public class MainDashboardView extends Application {
         searchBar.setPromptText("Search book");
 
         ComboBox<String> filterComboBox = new ComboBox<>();
-        filterComboBox.getItems().addAll("Sort", "Title", "Category", "Authors");
+        filterComboBox.getItems().addAll("Sort", "Title", "Category", "Author");
         filterComboBox.setValue("Sort");
         filterComboBox.setStyle("-fx-font-size: 14pt; -fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;");
+
+        searchBar.setOnAction(event -> {
+            String searchText = searchBar.getText().trim();
+            String sortBy = filterComboBox.getValue();
+            List<VBox> filteredBooks = fetchBooksFromDatabase(searchText, sortBy);
+            updateBookContainer(filteredBooks, sortBy);
+        });
 
         Image secondImage = new Image("/Assets/down-arrow.png");
         ImageView addImageView = new ImageView(secondImage);
@@ -155,37 +162,11 @@ public class MainDashboardView extends Application {
                 }
             }
         });
-        VBox bookContainer = new VBox();
+
+        bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
         bookContainer.setSpacing(40);
         bookContainer.setPadding(new Insets(10, 40, 10, 140));
-
-        List<VBox> bookBoxes = fetchBooksFromDatabase();
-        for (VBox bookVBox : bookBoxes) {
-            bookContainer.getChildren().add(bookVBox);
-        }
-
-        switch (userRole) {
-            case "Librarian":
-                actionComboBox.getItems().forEach(button -> {
-                    if (button.getText().equals("Check Librarian Performance") ||
-                            button.getText().equals("Book Statistics") ||
-                            button.getText().equals("Manage Employees") ||
-                            button.getText().equals("Total Cost")) {
-                        button.setDisable(true);
-                    }
-                });
-                break;
-            case "Manager":
-                actionComboBox.getItems().forEach(button -> {
-                    if (button.getText().equals("Manage Employees") ||
-                            button.getText().equals("Total Cost")) {
-                        button.setDisable(true);
-                    }
-                });
-                break;
-        }
-
         actionComboBox.setCellFactory(param -> new ListCell<Button>() {
             @Override
             protected void updateItem(Button item, boolean empty) {
@@ -201,23 +182,23 @@ public class MainDashboardView extends Application {
                 }
             }
         });
+        List<VBox> bookBoxes = fetchBooksFromDatabase("", "Title"); // Replace "Title" with default or desired sorting criteria
 
-        int booksPerRow = 4;
+        int booksPerRow = 6; // Display 6 books per row from the beginning
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
-            StackPane row = new StackPane();
-            HBox booksHBox = new HBox();
-            booksHBox.setAlignment(Pos.CENTER);
-            booksHBox.setSpacing(40);
+            HBox row = new HBox();
+            row.setAlignment(Pos.CENTER);
+            row.setSpacing(20);
 
             int booksInThisRow = Math.min(booksPerRow, bookBoxes.size() - i);
             for (int j = i; j < i + booksInThisRow; j++) {
                 VBox bookVBox = bookBoxes.get(j);
-                booksHBox.getChildren().add(bookVBox);
+                row.getChildren().add(bookVBox);
             }
 
-            row.getChildren().add(booksHBox);
             bookContainer.getChildren().add(row);
 
+            // Add a separator between rows, if not the last row
             if (i + booksInThisRow < bookBoxes.size()) {
                 Separator separator = new Separator();
                 separator.setOrientation(Orientation.HORIZONTAL);
@@ -225,7 +206,7 @@ public class MainDashboardView extends Application {
             }
         }
 
-        bookContainer.setAlignment(Pos.CENTER);
+        bookContainer.setAlignment(Pos.CENTER); // Center books horizontally
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -233,12 +214,26 @@ public class MainDashboardView extends Application {
         scrollPane.setContent(bookContainer);
 
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;-fx-font-weight:bold");
+        backButton.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10;");
         backButton.setPrefHeight(38);
         backButton.setMaxHeight(38);
         backButton.setMinHeight(38);
 
-        hbox.getChildren().addAll(backButton, searchBar, filterComboBox, actionComboBox);
+        backButton.setOnAction(event -> {
+            updateBookContainer(originalBooks, "Title"); // Assuming "Title" is the default sorting
+        });
+        Button refreshButton = new Button("Refresh");
+        refreshButton.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10;");
+        refreshButton.setPrefHeight(38);
+        refreshButton.setMaxHeight(38);
+        refreshButton.setMinHeight(38);
+
+        refreshButton.setOnAction(event -> {
+            originalBooks = fetchBooksFromDatabase("", "Title"); // Refresh books from the database
+            updateBookContainer(originalBooks, "Title");
+        });
+
+        hbox.getChildren().addAll(backButton ,refreshButton, searchBar, filterComboBox, actionComboBox);
 
         vbox.getChildren().addAll(stackPane, hbox, scrollPane);
 
@@ -248,6 +243,14 @@ public class MainDashboardView extends Application {
 
         primaryStage.setFullScreen(true);
         primaryStage.show();
+
+        // Event handler for searchBar to trigger search and sort
+        searchBar.setOnKeyReleased(event -> {
+            String searchText = searchBar.getText().trim();
+            String sortBy = filterComboBox.getValue();
+            List<VBox> filteredBooks = fetchBooksFromDatabase(searchText, sortBy);
+            updateBookContainer(filteredBooks, sortBy);
+        });
     }
 
     private Button createComboBoxButton(String text) {
@@ -259,12 +262,44 @@ public class MainDashboardView extends Application {
         return button;
     }
 
-    private List<VBox> fetchBooksFromDatabase() {
+    private List<VBox> fetchBooksFromDatabase(String searchQuery, String sortBy) {
         List<VBox> bookBoxes = new ArrayList<>();
 
         try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM books");
+            // Base query to select all books
+            String query = "SELECT * FROM books";
+
+            // Additional conditions for search query
+            if (!searchQuery.isEmpty()) {
+                query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
+            }
+
+            // Sorting condition
+            switch (sortBy) {
+                case "Title":
+                    query += " ORDER BY title";
+                    break;
+                case "Author":
+                    query += " ORDER BY author";
+                    break;
+                case "Category":
+                    query += " ORDER BY category";
+                    break;
+                default:
+                    // Default order or no specific sorting needed
+                    break;
+            }
+
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            // Bind parameters for search query
+            if (!searchQuery.isEmpty()) {
+                stmt.setString(1, "%" + searchQuery + "%"); // Searching title
+                stmt.setString(2, "%" + searchQuery + "%"); // Searching author
+                stmt.setString(3, "%" + searchQuery + "%"); // Searching category
+            }
+
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 String isbn = rs.getString("ISBN");
@@ -273,29 +308,36 @@ public class MainDashboardView extends Application {
                 Double sellingPrice = rs.getDouble("selling_price");
                 String author = rs.getString("author");
                 int stock = rs.getInt("stock");
+                String coverImageUrl = rs.getString("cover_image_path");
 
-                Blob coverImageBlob = rs.getBlob("cover_image");
-                byte[] imageData = coverImageBlob.getBytes(1, (int) coverImageBlob.length());
-                InputStream inputStream = new ByteArrayInputStream(imageData);
-                Image coverImage = new Image(inputStream);
+                // Assuming cover image path is stored in the database
+                if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
+                    Image coverImage = new Image(coverImageUrl);
 
-                VBox bookVBox = new VBox();
-                bookVBox.setSpacing(5);
-                bookVBox.setPadding(new Insets(10));
-                bookVBox.setAlignment(Pos.CENTER);
+                    VBox bookVBox = new VBox();
+                    bookVBox.setSpacing(5);
+                    bookVBox.setPadding(new Insets(10));
+                    bookVBox.setAlignment(Pos.CENTER);
 
-                Label isbnLabel = new Label("ISBN: " + isbn);
-                Label titleLabel = new Label("Title: " + title);
-                Label categoryLabel = new Label("Category: " + category);
-                Label authorLabel = new Label("Author: " + author);
+                    ImageView imageView = new ImageView(coverImage);
+                    imageView.setFitWidth(150);
+                    imageView.setFitHeight(200);
 
-                ImageView imageView = new ImageView(coverImage);
-                imageView.setFitWidth(150);
-                imageView.setFitHeight(200);
+                    Label titleLabel = new Label("Title: " + title);
+                    Label isbnLabel = new Label("ISBN: " + isbn);
+                    Label categoryLabel = new Label("Category: " + category);
+                    Label authorLabel = new Label("Author: " + author);
+                    Label priceLabel = new Label("Price: $" + sellingPrice);
+                    Label stockLabel = new Label("Stock: " + stock);
 
-                bookVBox.getChildren().addAll(isbnLabel, titleLabel, categoryLabel, authorLabel, imageView);
+                    VBox infoBox = new VBox(titleLabel, isbnLabel, categoryLabel, authorLabel, priceLabel, stockLabel);
+                    infoBox.setAlignment(Pos.CENTER);
+                    infoBox.setSpacing(5);
 
-                bookBoxes.add(bookVBox);
+                    bookVBox.getChildren().addAll(imageView, infoBox);
+
+                    bookBoxes.add(bookVBox);
+                }
             }
 
             rs.close();
@@ -308,8 +350,55 @@ public class MainDashboardView extends Application {
         return bookBoxes;
     }
 
+    private void updateBookContainer(List<VBox> filteredBooks, String sortBy) {
+        Platform.runLater(() -> {
+            bookContainer.getChildren().clear();
+            if (filteredBooks.isEmpty()) {
+                // Handle case when no books match the search
+                Label noResultsLabel = new Label("No results found.");
+                noResultsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+                noResultsLabel.setTextFill(Color.RED);
+                bookContainer.getChildren().add(noResultsLabel);
+            } else {
+                // Create rows of books with 6 books per row
+                int booksPerRow = 6; // Display 6 books per row initially
+                for (int i = 0; i < filteredBooks.size(); i += booksPerRow) {
+                    HBox row = new HBox();
+                    row.setAlignment(Pos.CENTER);
+                    row.setSpacing(20);
+
+                    // Add books to the current row
+                    int booksInThisRow = Math.min(booksPerRow, filteredBooks.size() - i);
+                    for (int j = i; j < i + booksInThisRow; j++) {
+                        VBox bookVBox = filteredBooks.get(j);
+                        row.getChildren().add(bookVBox);
+                    }
+
+                    // Add the row to the book container
+                    bookContainer.getChildren().add(row);
+
+                    // Add a separator between rows, if not the last row
+                    if (i + booksInThisRow < filteredBooks.size()) {
+                        Separator separator = new Separator();
+                        separator.setOrientation(Orientation.HORIZONTAL);
+                        bookContainer.getChildren().add(separator);
+                    }
+                }
+            }
+        });
+    }
+
+    // Method to check if a button is enabled
     private boolean isButtonEnabled(Button button) {
         return !button.isDisabled();
     }
-}
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        if (conn != null && !conn.isClosed()) {
+            conn.close();
+            System.out.println("Database connection closed.");
+        }
+    }
+}

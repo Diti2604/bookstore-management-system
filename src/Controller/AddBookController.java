@@ -58,7 +58,7 @@ public class AddBookController {
                 }
 
             } else {
-                String insertBookSQL = "INSERT INTO books (isbn, title, category, selling_price, author, stock, cover_image) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                String insertBookSQL = "INSERT INTO books (isbn, title, category, selling_price, author, stock, cover_image_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement insertStatement = conn.prepareStatement(insertBookSQL);
                 insertStatement.setString(1, book.getISBN());
                 insertStatement.setString(2, book.getTitle());
@@ -105,7 +105,7 @@ public class AddBookController {
                 String category = resultSet.getString("category");
                 String author = resultSet.getString("author");
                 double sellingPrice = resultSet.getDouble("selling_price");
-                String imageUrl = resultSet.getString("cover_image");
+                String imageUrl = resultSet.getString("cover_image_path");
 
                 return new Book(imageUrl, title, category, isbn, author, sellingPrice);
             }

@@ -32,24 +32,29 @@ public class TotalCostView extends Application {
         Button calculateButton = new Button("Calculate Total Cost");
         calculateButton.setOnAction(event -> {
             String selectedTimeframe = timeframeComboBox.getValue();
+
             double totalAdminSalary = totalCostController.calculateSalaryByRoleAndTimeframe("Administrator", selectedTimeframe);
             double totalManagerSalary = totalCostController.calculateSalaryByRoleAndTimeframe("Manager", selectedTimeframe);
             double totalLibrarianSalary = totalCostController.calculateSalaryByRoleAndTimeframe("Librarian", selectedTimeframe);
-            double totalBookCostWithTax = totalCostController.calculateTotalBookCostWithTaxByTimeframe(selectedTimeframe);
 
             double totalEmployeeCost = totalAdminSalary + totalManagerSalary + totalLibrarianSalary;
-            double totalCost = totalEmployeeCost + totalBookCostWithTax;
+
+            double totalBillCostWithTax = totalCostController.calculateTotalBillCostWithTaxByTimeframe(selectedTimeframe);
+
+            double totalCost = totalEmployeeCost + totalBillCostWithTax;
 
             ObservableList<CostItem> data = FXCollections.observableArrayList(
                     new CostItem("Total Administrator Costs", totalAdminSalary),
                     new CostItem("Total Manager Costs", totalManagerSalary),
                     new CostItem("Total Librarian Costs", totalLibrarianSalary),
-                    new CostItem("Total Book Costs (with 20% tax)", totalBookCostWithTax),
                     new CostItem("Total Employee Costs", totalEmployeeCost),
+                    new CostItem("Total Bill Costs (with 20% tax)", totalBillCostWithTax),
                     new CostItem("Total Overall Cost", totalCost)
             );
+
             tableView.setItems(data);
         });
+
 
         VBox root = new VBox(10, timeframeComboBox, calculateButton, tableView);
         root.setPadding(new Insets(10));
@@ -67,7 +72,7 @@ public class TotalCostView extends Application {
         TableColumn<CostItem, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
-        TableColumn<CostItem, Double> amountColumn = new TableColumn<>("Amount");
+        TableColumn<CostItem, Double> amountColumn = new TableColumn<>("Amount ($)");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
         tableView.getColumns().addAll(descriptionColumn, amountColumn);

@@ -39,7 +39,7 @@ public class CreateBillController {
                 double sellingPrice = rs.getDouble("selling_price");
                 String author = rs.getString("author");
                 int stock = rs.getInt("stock");
-                Blob coverImageBlob = rs.getBlob("cover_image");
+                Blob coverImageBlob = rs.getBlob("cover_image_path");
 
                 Image coverImage = null;
                 if (coverImageBlob != null) {

@@ -41,13 +41,12 @@ public class AddBookView extends Application {
     private Button searchButton;
 
     private static final String ISBN_REGEX = "\\d{4}-\\d{2}-\\d{4}";
-    private static final String AUTHOR_REGEX = "^[a-zA-Z\\s]+$"; // Only letters and spaces
+    private static final String AUTHOR_REGEX = "^[a-zA-Z\\s]+$";
 
     List<String> bookCategories = Arrays.asList(
             "Fantasy", "Science Fiction", "Mystery", "Thriller", "Romance",
             "Biography", "Memoir", "History", "Self-help", "Cookbooks",
-            "Young Adult", "Children's Books", "Poetry", "Drama/Plays",
-            "Horror", "Travel", "Graphic Novels/Comics", "Science"
+            "Young Adult", "Fiction","Children's Books", "Poetry","Satire", "Drama/Plays","Adventure"
     );
 
     public static void main(String[] args) {
@@ -239,7 +238,7 @@ public class AddBookView extends Application {
         }
     }
 
-    private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
+        private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(headerText);

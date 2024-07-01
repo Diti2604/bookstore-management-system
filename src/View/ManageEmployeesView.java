@@ -154,6 +154,7 @@ public class ManageEmployeesView extends Application {
             String email = emailTextField.getText();
             String salaryStr = salaryTextField.getText();
             String role = roleComboBox.getValue();
+            String phoneRegex = "^(068|069|067)\\d{7}$";
 
             if (!Pattern.matches("^[a-zA-Z0-9]+$", username)) {
                 showAlert("Invalid Username", "Username should only contain letters and numbers.");
@@ -167,8 +168,8 @@ public class ManageEmployeesView extends Application {
                 showAlert("Invalid Name", "Name should only contain letters.");
                 return;
             }
-            if (!Pattern.matches("^\\d{10}$", phone)) {
-                showAlert("Invalid Phone", "Phone should only contain 10 digits.");
+            if (!Pattern.matches(phoneRegex, phone)) {
+                showAlert("Invalid Phone", "Phone number must start with 068, 069, or 067 and be 10 digits long.");
                 return;
             }
             if (!Pattern.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$", email)) {
