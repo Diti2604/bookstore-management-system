@@ -182,9 +182,9 @@ public class MainDashboardView extends Application {
                 }
             }
         });
-        List<VBox> bookBoxes = fetchBooksFromDatabase("", "Title"); // Replace "Title" with default or desired sorting criteria
+        List<VBox> bookBoxes = fetchBooksFromDatabase("", "Title");
 
-        int booksPerRow = 6; // Display 6 books per row from the beginning
+        int booksPerRow = 6;
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
             HBox row = new HBox();
             row.setAlignment(Pos.CENTER);
@@ -198,7 +198,6 @@ public class MainDashboardView extends Application {
 
             bookContainer.getChildren().add(row);
 
-            // Add a separator between rows, if not the last row
             if (i + booksInThisRow < bookBoxes.size()) {
                 Separator separator = new Separator();
                 separator.setOrientation(Orientation.HORIZONTAL);
@@ -206,7 +205,7 @@ public class MainDashboardView extends Application {
             }
         }
 
-        bookContainer.setAlignment(Pos.CENTER); // Center books horizontally
+        bookContainer.setAlignment(Pos.CENTER);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -220,7 +219,7 @@ public class MainDashboardView extends Application {
         backButton.setMinHeight(38);
 
         backButton.setOnAction(event -> {
-            updateBookContainer(originalBooks, "Title"); // Assuming "Title" is the default sorting
+            updateBookContainer(originalBooks, "Title");
         });
         Button refreshButton = new Button("Refresh");
         refreshButton.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10;");
@@ -229,7 +228,7 @@ public class MainDashboardView extends Application {
         refreshButton.setMinHeight(38);
 
         refreshButton.setOnAction(event -> {
-            originalBooks = fetchBooksFromDatabase("", "Title"); // Refresh books from the database
+            originalBooks = fetchBooksFromDatabase("", "Title");
             updateBookContainer(originalBooks, "Title");
         });
 
@@ -244,7 +243,6 @@ public class MainDashboardView extends Application {
         primaryStage.setFullScreen(true);
         primaryStage.show();
 
-        // Event handler for searchBar to trigger search and sort
         searchBar.setOnKeyReleased(event -> {
             String searchText = searchBar.getText().trim();
             String sortBy = filterComboBox.getValue();
@@ -266,15 +264,12 @@ public class MainDashboardView extends Application {
         List<VBox> bookBoxes = new ArrayList<>();
 
         try {
-            // Base query to select all books
             String query = "SELECT * FROM books";
 
-            // Additional conditions for search query
             if (!searchQuery.isEmpty()) {
                 query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
             }
 
-            // Sorting condition
             switch (sortBy) {
                 case "Title":
                     query += " ORDER BY title";
@@ -286,17 +281,15 @@ public class MainDashboardView extends Application {
                     query += " ORDER BY category";
                     break;
                 default:
-                    // Default order or no specific sorting needed
                     break;
             }
 
             PreparedStatement stmt = conn.prepareStatement(query);
 
-            // Bind parameters for search query
             if (!searchQuery.isEmpty()) {
-                stmt.setString(1, "%" + searchQuery + "%"); // Searching title
-                stmt.setString(2, "%" + searchQuery + "%"); // Searching author
-                stmt.setString(3, "%" + searchQuery + "%"); // Searching category
+                stmt.setString(1, "%" + searchQuery + "%");
+                stmt.setString(2, "%" + searchQuery + "%");
+                stmt.setString(3, "%" + searchQuery + "%");
             }
 
             ResultSet rs = stmt.executeQuery();
@@ -310,7 +303,6 @@ public class MainDashboardView extends Application {
                 int stock = rs.getInt("stock");
                 String coverImageUrl = rs.getString("cover_image_path");
 
-                // Assuming cover image path is stored in the database
                 if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
                     Image coverImage = new Image(coverImageUrl);
 
@@ -354,30 +346,25 @@ public class MainDashboardView extends Application {
         Platform.runLater(() -> {
             bookContainer.getChildren().clear();
             if (filteredBooks.isEmpty()) {
-                // Handle case when no books match the search
                 Label noResultsLabel = new Label("No results found.");
                 noResultsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
                 noResultsLabel.setTextFill(Color.RED);
                 bookContainer.getChildren().add(noResultsLabel);
             } else {
-                // Create rows of books with 6 books per row
-                int booksPerRow = 6; // Display 6 books per row initially
+                int booksPerRow = 6;
                 for (int i = 0; i < filteredBooks.size(); i += booksPerRow) {
                     HBox row = new HBox();
                     row.setAlignment(Pos.CENTER);
                     row.setSpacing(20);
 
-                    // Add books to the current row
                     int booksInThisRow = Math.min(booksPerRow, filteredBooks.size() - i);
                     for (int j = i; j < i + booksInThisRow; j++) {
                         VBox bookVBox = filteredBooks.get(j);
                         row.getChildren().add(bookVBox);
                     }
 
-                    // Add the row to the book container
                     bookContainer.getChildren().add(row);
 
-                    // Add a separator between rows, if not the last row
                     if (i + booksInThisRow < filteredBooks.size()) {
                         Separator separator = new Separator();
                         separator.setOrientation(Orientation.HORIZONTAL);
@@ -388,7 +375,6 @@ public class MainDashboardView extends Application {
         });
     }
 
-    // Method to check if a button is enabled
     private boolean isButtonEnabled(Button button) {
         return !button.isDisabled();
     }
