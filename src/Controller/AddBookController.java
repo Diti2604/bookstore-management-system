@@ -17,10 +17,10 @@ public class AddBookController {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
-            String user = System.getenv("DB_USER");
+            String user = System.getenv("root");
             System.out.println(user);
-            String password = System.getenv("DB_PASSWORD");
-            conn = DriverManager.getConnection(url, user, password);
+            String password = System.getenv("DitiHost2604");
+            conn = DriverManager.getConnection(url, "root", "DitiHost2604");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

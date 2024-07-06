@@ -119,10 +119,7 @@ public class AddBookView extends Application {
         imageView.setFitHeight(225);
         grid.add(imageView, 1, 8);
 
-        chooseImageButton = new Button("Choose Image");
-        chooseImageButton.setStyle("-fx-font-family: 'Times New Roman'; -fx-font-weight: bold; -fx-background-radius: 15; -fx-border-radius: 15;");
-        chooseImageButton.setOnAction(e -> chooseImage());
-        grid.add(chooseImageButton, 1, 9);
+
 
         submitButton = new Button("Create");
         submitButton.setStyle("-fx-font-family: 'Times New Roman'; -fx-font-weight: bold; -fx-background-radius: 15; -fx-border-radius: 15;");
