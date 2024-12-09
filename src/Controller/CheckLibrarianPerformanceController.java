@@ -18,8 +18,8 @@ public class CheckLibrarianPerformanceController {
             String url = "jdbc:mysql://localhost:3306/bookstore";
             String user = System.getenv("root");
             System.out.println(user);
-            String password = System.getenv("DitiHost2604");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookstore", "root", "DitiHost2604");
+            String password = System.getenv("IndritFerati2604!");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookstore", "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

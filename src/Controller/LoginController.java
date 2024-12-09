@@ -10,9 +10,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -24,43 +21,29 @@ public class LoginController {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
-            String user = System.getenv("root");
-            String password = System.getenv("DitiHost2604");
-            conn = DriverManager.getConnection(url, "root", "DitiHost2604");
+            conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-
-    private String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
+    // Validate login credentials (without hashing)
     public User validateCredentials(String username, String enteredPassword) {
         try {
             String query = "SELECT * FROM users WHERE username = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, username);
-
             ResultSet rs = pstmt.executeQuery();
+
             if (rs.next()) {
-                String storedHashedPassword = rs.getString("password");
-                String enteredHashedPassword = User.hashPassword(enteredPassword);
-                if (enteredHashedPassword.equals(storedHashedPassword)) {
+                String storedPassword = rs.getString("password");  // Retrieve stored password (plain text)
+
+                // Debugging line to print out the plain passwords
+                System.out.println("Stored Password: " + storedPassword);
+                System.out.println("Entered Password: " + enteredPassword);
+
+                // Compare the plain text passwords directly
+                if (enteredPassword.equals(storedPassword)) {
                     String name = rs.getString("name");
                     LocalDate birthday = rs.getDate("birthday").toLocalDate();
                     String phone = rs.getString("phone");
@@ -68,21 +51,29 @@ public class LoginController {
                     double salary = rs.getDouble("salary");
                     String role = rs.getString("role");
 
+                    System.out.println("Role from database: " + role);  // Debugging role
+
                     switch (role) {
                         case "Librarian":
-                            return new Librarian(username, storedHashedPassword, name, birthday, phone, email, salary, role);
+                            return new Librarian(username, storedPassword, name, birthday, phone, email, salary, role);
                         case "Manager":
-                            return new Manager(username, storedHashedPassword, name, birthday, phone, email, salary, role);
+                            return new Manager(username, storedPassword, name, birthday, phone, email, salary, role);
                         case "Administrator":
-                            return new Administrator(username, storedHashedPassword, name, birthday, phone, email, salary, role);
+                            return new Administrator(username, storedPassword, name, birthday, phone, email, salary, role);
                     }
+                } else {
+                    System.out.println("Password mismatch");
                 }
+            } else {
+                System.out.println("No user found");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
+
+    // Handle login action
     public void handleLogin(Stage stage, String username, String password) {
         User user = validateCredentials(username, password);
         if (user != null) {

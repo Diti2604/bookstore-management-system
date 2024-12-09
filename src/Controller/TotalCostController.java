@@ -13,8 +13,8 @@ public class TotalCostController {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
             String user = System.getenv("root");
-            String password = System.getenv("DitiHost2604");
-            conn = DriverManager.getConnection(url, "root","DitiHost2604");
+            String password = System.getenv("IndritFerati2604!");
+            conn = DriverManager.getConnection(url, "root","IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

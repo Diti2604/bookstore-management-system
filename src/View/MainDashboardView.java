@@ -17,6 +17,8 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,23 +45,31 @@ public class MainDashboardView extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+            // Database connection
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
-            String user = System.getenv("root");
-            String password = System.getenv("DitiHost2604");
-            conn = DriverManager.getConnection(url, "root","DitiHost2604");
+            conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
             System.out.println("Connected to the database!");
+
 
             originalBooks = fetchBooksFromDatabase("", "Title");
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            System.out.println("MySQL JDBC Driver not found.");
+            showErrorDialog("Database Driver Error", "MySQL JDBC Driver not found.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Connection failed. Check output console.");
+            showErrorDialog("Database Connection Error", "Failed to connect to the database.");
         }
+    }
+
+    private void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void launchDashboard(Stage primaryStage) {
@@ -126,7 +136,7 @@ public class MainDashboardView extends Application {
             if (selectedButton != null) {
                 Stage newStage = new Stage();
                 newStage.initModality(Modality.APPLICATION_MODAL);
-                newStage.initOwner(primaryStage);
+                 newStage.initOwner(primaryStage);
 
                 switch (selectedButton.getText()) {
                     case "Create Bill":
@@ -167,6 +177,7 @@ public class MainDashboardView extends Application {
         bookContainer.setAlignment(Pos.TOP_CENTER);
         bookContainer.setSpacing(40);
         bookContainer.setPadding(new Insets(10, 40, 10, 140));
+
         actionComboBox.setCellFactory(param -> new ListCell<Button>() {
             @Override
             protected void updateItem(Button item, boolean empty) {
@@ -182,9 +193,9 @@ public class MainDashboardView extends Application {
                 }
             }
         });
-        List<VBox> bookBoxes = fetchBooksFromDatabase("", "Title");
 
-        int booksPerRow = 6;
+        List<VBox> bookBoxes = fetchBooksFromDatabase("", "Title");
+        int booksPerRow = 4;
         for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
             HBox row = new HBox();
             row.setAlignment(Pos.CENTER);
@@ -221,6 +232,7 @@ public class MainDashboardView extends Application {
         backButton.setOnAction(event -> {
             updateBookContainer(originalBooks, "Title");
         });
+
         Button refreshButton = new Button("Refresh");
         refreshButton.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10;");
         refreshButton.setPrefHeight(38);
@@ -242,7 +254,6 @@ public class MainDashboardView extends Application {
 
         primaryStage.setFullScreen(true);
         primaryStage.show();
-
         searchBar.setOnKeyReleased(event -> {
             String searchText = searchBar.getText().trim();
             String sortBy = filterComboBox.getValue();
@@ -251,96 +262,49 @@ public class MainDashboardView extends Application {
         });
     }
 
-    private Button createComboBoxButton(String text) {
-        Button button = new Button(text);
-        button.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2; -fx-font-weight:bold");
-        button.setPrefHeight(38);
-        button.setMaxHeight(38);
-        button.setMinHeight(38);
-        return button;
+private Button createComboBoxButton(String text) {
+    Button button = new Button(text);
+    button.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2; -fx-font-weight:bold");
+    button.setPrefHeight(38);
+    button.setMaxHeight(38);
+    button.setMinHeight(38);
+    return button;
+}
+
+    private void performSearch(TextField searchBar, ComboBox<String> filterComboBox) {
+        String searchText = searchBar.getText().trim();
+        String sortBy = filterComboBox.getValue();
+        List<VBox> filteredBooks = fetchBooksFromDatabase(searchText, sortBy);
+        displayBooks(filteredBooks);
     }
 
-    private List<VBox> fetchBooksFromDatabase(String searchQuery, String sortBy) {
-        List<VBox> bookBoxes = new ArrayList<>();
+    private void displayBooks(List<VBox> bookBoxes) {
+        Platform.runLater(() -> {
+            bookContainer.getChildren().clear();
 
-        try {
-            String query = "SELECT * FROM books";
+            int booksPerRow = 6;
+            for (int i = 0; i < bookBoxes.size(); i += booksPerRow) {
+                HBox row = new HBox();
+                row.setAlignment(Pos.CENTER);
+                row.setSpacing(20);
 
-            if (!searchQuery.isEmpty()) {
-                query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
-            }
+                int booksInThisRow = Math.min(booksPerRow, bookBoxes.size() - i);
+                for (int j = i; j < i + booksInThisRow; j++) {
+                    VBox bookVBox = bookBoxes.get(j);
+                    row.getChildren().add(bookVBox);
+                }
 
-            switch (sortBy) {
-                case "Title":
-                    query += " ORDER BY title";
-                    break;
-                case "Author":
-                    query += " ORDER BY author";
-                    break;
-                case "Category":
-                    query += " ORDER BY category";
-                    break;
-                default:
-                    break;
-            }
+                bookContainer.getChildren().add(row);
 
-            PreparedStatement stmt = conn.prepareStatement(query);
-
-            if (!searchQuery.isEmpty()) {
-                stmt.setString(1, "%" + searchQuery + "%");
-                stmt.setString(2, "%" + searchQuery + "%");
-                stmt.setString(3, "%" + searchQuery + "%");
-            }
-
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                String isbn = rs.getString("ISBN");
-                String title = rs.getString("title");
-                String category = rs.getString("category");
-                Double sellingPrice = rs.getDouble("selling_price");
-                String author = rs.getString("author");
-                int stock = rs.getInt("stock");
-                String coverImageUrl = rs.getString("cover_image_path");
-
-                if (coverImageUrl != null && !coverImageUrl.isEmpty()) {
-                    Image coverImage = new Image(coverImageUrl);
-
-                    VBox bookVBox = new VBox();
-                    bookVBox.setSpacing(5);
-                    bookVBox.setPadding(new Insets(10));
-                    bookVBox.setAlignment(Pos.CENTER);
-
-                    ImageView imageView = new ImageView(coverImage);
-                    imageView.setFitWidth(150);
-                    imageView.setFitHeight(200);
-
-                    Label titleLabel = new Label("Title: " + title);
-                    Label isbnLabel = new Label("ISBN: " + isbn);
-                    Label categoryLabel = new Label("Category: " + category);
-                    Label authorLabel = new Label("Author: " + author);
-                    Label priceLabel = new Label("Price: $" + sellingPrice);
-                    Label stockLabel = new Label("Stock: " + stock);
-
-                    VBox infoBox = new VBox(titleLabel, isbnLabel, categoryLabel, authorLabel, priceLabel, stockLabel);
-                    infoBox.setAlignment(Pos.CENTER);
-                    infoBox.setSpacing(5);
-
-                    bookVBox.getChildren().addAll(imageView, infoBox);
-
-                    bookBoxes.add(bookVBox);
+                if (i + booksInThisRow < bookBoxes.size()) {
+                    Separator separator = new Separator();
+                    separator.setOrientation(Orientation.HORIZONTAL);
+                    bookContainer.getChildren().add(separator);
                 }
             }
-
-            rs.close();
-            stmt.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return bookBoxes;
+        });
     }
+
 
     private void updateBookContainer(List<VBox> filteredBooks, String sortBy) {
         Platform.runLater(() -> {
@@ -379,12 +343,129 @@ public class MainDashboardView extends Application {
         return !button.isDisabled();
     }
 
+    private List<VBox> fetchBooksFromDatabase(String searchQuery, String sortBy) {
+        List<VBox> bookBoxes = new ArrayList<>();
+
+        try {
+            String query = "SELECT * FROM books";
+
+            if (!searchQuery.isEmpty()) {
+                query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
+            }
+
+            switch (sortBy) {
+                case "Title":
+                    query += " ORDER BY title";
+                    break;
+                case "Author":
+                    query += " ORDER BY author";
+                    break;
+                case "Category":
+                    query += " ORDER BY category";
+                    break;
+                default:
+                    break;
+            }
+
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            if (!searchQuery.isEmpty()) {
+                stmt.setString(1, "%" + searchQuery + "%");
+                stmt.setString(2, "%" + searchQuery + "%");
+                stmt.setString(3, "%" + searchQuery + "%");
+            }
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                VBox bookBox = createBookBox(
+                        rs.getString("ISBN"),
+                        rs.getString("title"),
+                        rs.getString("category"),
+                        rs.getDouble("selling_price"),
+                        rs.getString("author"),
+                        rs.getInt("stock"),
+                        rs.getString("cover_image_path")
+                );
+
+                bookBoxes.add(bookBox);
+            }
+
+            rs.close();
+            stmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showErrorDialog("Database Error", "Failed to fetch books from database.");
+        }
+
+        return bookBoxes;
+    }
+
+    private VBox createBookBox(String isbn, String title, String category,
+                               Double sellingPrice, String author,
+                               int stock, String coverImagePath) {
+        VBox bookVBox = new VBox();
+        bookVBox.setSpacing(5);
+        bookVBox.setPadding(new Insets(10));
+        bookVBox.setAlignment(Pos.CENTER);
+
+        // Image View Setup
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(150);
+        imageView.setFitHeight(200);
+        imageView.setPreserveRatio(true);
+
+        // Load Image with Robust Error Handling
+        try {
+            // Use absolute file path for development
+            File imageFile = new File("src/Assets/" + coverImagePath);
+
+            if (imageFile.exists()) {
+                Image coverImage = new Image(new FileInputStream(imageFile));
+                imageView.setImage(coverImage);
+            } else {
+                System.out.println("Image not found: " + imageFile.getAbsolutePath());
+                // Optional: Set a default image
+                // imageView.setImage(new Image(getClass().getResourceAsStream("/default-book-cover.jpg")));
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading image for book: " + title);
+            e.printStackTrace();
+        }
+
+        // Book Information Labels
+        Label titleLabel = new Label("Title: " + title);
+        Label isbnLabel = new Label("ISBN: " + isbn);
+        Label categoryLabel = new Label("Category: " + category);
+        Label authorLabel = new Label("Author: " + author);
+        Label priceLabel = new Label("Price: $" + String.format("%.2f", sellingPrice));
+        Label stockLabel = new Label("Stock: " + stock);
+
+        // Style the labels
+        Font infoFont = Font.font(12);
+        titleLabel.setFont(Font.font(14));
+        titleLabel.setStyle("-fx-font-weight: bold;");
+
+        VBox infoBox = new VBox(titleLabel, isbnLabel, categoryLabel,
+                authorLabel, priceLabel, stockLabel);
+        infoBox.setAlignment(Pos.CENTER);
+        infoBox.setSpacing(5);
+
+        bookVBox.getChildren().addAll(imageView, infoBox);
+
+        return bookVBox;
+    }
+
+    // Cleanup database connection
     @Override
-    public void stop() throws Exception {
-        super.stop();
-        if (conn != null && !conn.isClosed()) {
-            conn.close();
-            System.out.println("Database connection closed.");
+    public void stop() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
