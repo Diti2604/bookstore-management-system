@@ -19,7 +19,7 @@ public class ManageEmployeesController {
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
             System.out.println("Connected to the database!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
 
@@ -43,7 +43,7 @@ public class ManageEmployeesController {
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error inserting Employee in db");
             return false;
         }
     }
@@ -57,7 +57,7 @@ public class ManageEmployeesController {
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error deleting User from db");
             return false;
         }
     }
@@ -82,7 +82,7 @@ public class ManageEmployeesController {
                 users.add(user);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error fetching user from DB");
         }
         return users;
     }
@@ -104,7 +104,7 @@ public class ManageEmployeesController {
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error updating user in db");
             return false;
         }
     }
@@ -118,7 +118,7 @@ public class ManageEmployeesController {
                 return count > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error from sql checking if username exists");
         }
         return false;
     }

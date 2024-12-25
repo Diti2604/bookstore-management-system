@@ -4,7 +4,6 @@ import Model.User;
 import Model.Librarian;
 import Model.Manager;
 import Model.Administrator;
-import View.LoginView;
 import View.MainDashboardView;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -23,7 +22,7 @@ public class LoginController {
             String url = "jdbc:mysql://localhost:3306/bookstore";
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
 
@@ -68,7 +67,7 @@ public class LoginController {
                 System.out.println("No user found");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("SQL Error: " + e.getMessage());
         }
         return null;
     }
@@ -82,7 +81,7 @@ public class LoginController {
                 MainDashboardView dashboardView = new MainDashboardView(user.getRole(), username);
                 dashboardView.start(stage);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Login failed");
             }
         } else {
             Alert alert = new Alert(AlertType.ERROR);

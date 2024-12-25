@@ -1,10 +1,9 @@
 package Controller;
 
 import Model.Book;
-import View.AddBookView;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+
 
 import java.sql.*;
 
@@ -22,7 +21,7 @@ public class AddBookController {
             String password = System.getenv("IndritFerati2604!");
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
     public void saveBook(Book book) {

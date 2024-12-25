@@ -17,8 +17,7 @@ public class BookStatisticsController {
             String password = System.getenv("IndritFerati2604!");
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");        }
     }
 
     public ObservableList<Book> getDailyStatistics() {
@@ -53,7 +52,7 @@ public class BookStatisticsController {
                 statistics.add(new Book(bookTitle, totalQuantity, totalPrice));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Connection failed");
         }
         return statistics;
     }

@@ -1,6 +1,5 @@
 package Controller;
 
-import Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -21,7 +20,7 @@ public class CheckLibrarianPerformanceController {
             String password = System.getenv("IndritFerati2604!");
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookstore", "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
 
@@ -42,13 +41,12 @@ public class CheckLibrarianPerformanceController {
 
         } catch (SQLException e) {
             System.err.println("Error fetching librarians:");
-            e.printStackTrace();
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Error fetching librarians:");
             }
         }
 
@@ -83,13 +81,13 @@ public class CheckLibrarianPerformanceController {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error fetching librarians:");
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.out.println("Error fetching librarians:");
             }
         }
 

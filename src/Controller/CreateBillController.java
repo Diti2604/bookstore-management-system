@@ -1,7 +1,6 @@
 package Controller;
 
 import Model.Book;
-import View.*;
 import javafx.scene.image.Image;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +21,7 @@ public class CreateBillController {
             String password = System.getenv("IndritFerati2604!");
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
 
@@ -50,7 +49,7 @@ public class CreateBillController {
                 return new Book(isbn, title, category, sellingPrice, author, stock, coverImage);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error fetching book by isbn from database with isbn: " + isbn);
         }
         return null;
     }
@@ -63,7 +62,7 @@ public class CreateBillController {
             pstmt.setString(2, isbn);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error while updating stock for books");
         }
     }
     public void saveBillToDatabase(String librarianUsername, String title, int quantity, double totalPrice) {
@@ -76,7 +75,7 @@ public class CreateBillController {
             pstmt.setDouble(4, totalPrice);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error while saving bill to the database");
         }
     }
 
@@ -91,7 +90,7 @@ public class CreateBillController {
                 isbns.add(rs.getString("ISBN"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error fetching ISBNs in stock");
         }
         return isbns;
     }

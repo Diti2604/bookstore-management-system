@@ -16,8 +16,11 @@ public class TotalCostController {
             String password = System.getenv("IndritFerati2604!");
             conn = DriverManager.getConnection(url, "root","IndritFerati2604!");
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
+    }
+    public TotalCostController(Connection conn) {
+        this.conn = conn;
     }
 
     public double calculateSalaryByRoleAndTimeframe(String role, String timeframe) {
@@ -31,7 +34,7 @@ public class TotalCostController {
                 totalSalary += rs.getDouble("salary");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("SQLException: Error fetching salary from user with given role " + e.getMessage());
         }
 
         double annualSalary = totalSalary;
@@ -55,7 +58,7 @@ public class TotalCostController {
     }
 
     public double calculateTotalBillCostWithTaxByTimeframe(String timeframe) {
-        List<Double> billsTotalCosts = new ArrayList<>();
+        List<Double> billsTotalCosts;
         LocalDate today = LocalDate.now();
         switch (timeframe.toLowerCase()) {
             case "daily":
@@ -101,7 +104,7 @@ public class TotalCostController {
                 totalCosts.add(price);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("SQLException: Error fetching total price from DB");
         }
         return totalCosts;
     }
@@ -118,7 +121,7 @@ public class TotalCostController {
                 totalCosts.add(price);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error fetching total price from bill");
         }
         return totalCosts;
     }
