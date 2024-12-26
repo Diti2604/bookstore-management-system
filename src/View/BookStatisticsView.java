@@ -21,6 +21,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
+
 public class BookStatisticsView extends Application {
     private TableView<Book> statisticsTableView;
     private BookStatisticsController statisticsController;
@@ -64,7 +66,9 @@ public class BookStatisticsView extends Application {
         TableColumn<Book, Double> totalPriceColumn = new TableColumn<>("Total Price");
         totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-        statisticsTableView.getColumns().addAll(titleColumn, quantityColumn, totalPriceColumn);
+        statisticsTableView.getColumns().addAll(
+                Arrays.asList(titleColumn, quantityColumn, totalPriceColumn)
+        );
         statisticsTableView.setPrefHeight(400);
         statisticsTableView.setPrefWidth(600);
 
