@@ -13,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
+
 public class TotalCostView extends Application {
     private TotalCostController totalCostController;
     private TableView<CostItem> tableView;
@@ -75,7 +77,7 @@ public class TotalCostView extends Application {
         TableColumn<CostItem, Double> amountColumn = new TableColumn<>("Amount ($)");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        tableView.getColumns().addAll(descriptionColumn, amountColumn);
+        tableView.getColumns().addAll(Arrays.asList(descriptionColumn, amountColumn));
 
         return tableView;
     }
