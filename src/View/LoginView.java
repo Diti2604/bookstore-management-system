@@ -41,18 +41,7 @@ public class LoginView extends Application {
         passwordField.setPromptText("Enter password");
         passwordField.setMaxWidth(200);
 
-        Button loginButton = new Button("Log in");
-        loginButton.setStyle("-fx-border-radius: 8px;-fx-border-width:4px;  -fx-font-weight:bold; -fx-background-color:white;-fx-cursor:pointer;");
-        loginButton.setPrefHeight(20);
-
-        loginButton.setOnMouseEntered(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: hand;"));
-        loginButton.setOnMouseExited(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: pointer;"));
-
-        loginButton.setOnAction(event -> {
-            String username = usernameTextField.getText();
-            String password = passwordField.getText();
-            loginController.handleLogin(stage, username, password);
-        });
+        Button loginButton = getButton(stage, usernameTextField, passwordField);
 
         VBox loginPane = new VBox();
         loginPane.setAlignment(Pos.CENTER);
@@ -77,5 +66,21 @@ public class LoginView extends Application {
         stage.setMaximized(true);
 
         stage.show();
+    }
+
+    private Button getButton(Stage stage, TextField usernameTextField, PasswordField passwordField) {
+        Button loginButton = new Button("Log in");
+        loginButton.setStyle("-fx-border-radius: 8px;-fx-border-width:4px;  -fx-font-weight:bold; -fx-background-color:white;-fx-cursor:pointer;");
+        loginButton.setPrefHeight(20);
+
+        loginButton.setOnMouseEntered(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: hand;"));
+        loginButton.setOnMouseExited(e -> loginButton.setStyle("-fx-border-radius: 8px; -fx-border-width: 4px; -fx-font-weight: bold; -fx-background-color: white; -fx-cursor: pointer;"));
+
+        loginButton.setOnAction(event -> {
+            String username = usernameTextField.getText();
+            String password = passwordField.getText();
+            loginController.handleLogin(stage, username, password);
+        });
+        return loginButton;
     }
 }
