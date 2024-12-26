@@ -1,6 +1,6 @@
 package Model;
 
-import java.nio.charset.StandardCharsets;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -98,7 +98,7 @@ public class User {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.out.println("Password hashing failed!");
             return null;
         }
     }

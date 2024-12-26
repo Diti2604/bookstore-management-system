@@ -11,7 +11,6 @@ public class Book {
     private int stock;
     private Image coverImage;
     private String url;
-    private String coverImageUrl;
 
     public Book(String ISBN, String title, String category, double sellingPrice, String author, int stock, Image coverImage) {
         this.ISBN = ISBN;
@@ -60,8 +59,9 @@ public class Book {
         this.sellingPrice = sellingPrice;
         this.author = author;
         this.stock = stock;
-        this.coverImageUrl = coverImageUrl;
+        this.url = coverImageUrl; // Use url for cover image URL
     }
+
     public Book(Double sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
@@ -128,14 +128,6 @@ public class Book {
     }
 
     public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getCoverImagePath() {
-        return url;
-    }
-
-    public void setCoverImagePath(String url) {
         this.url = url;
     }
 }
