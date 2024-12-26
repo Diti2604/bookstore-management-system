@@ -1,6 +1,5 @@
 package View;
 
-import Model.User;
 import Controller.CreateBillController;
 import Model.Book;
 import javafx.application.Application;
@@ -17,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.List;
 
 public class BillView extends Application {
@@ -27,21 +27,21 @@ public class BillView extends Application {
     private Label totalLabel;
     private Label billNumberLabel;
 
-    private TableView<Book> bookTableView;
-    private ObservableList<Book> books;
-    private CreateBillController createBillController;
-    private String librarianUsername;
+    TableView<Book> bookTableView;
+    final ObservableList<Book> books;
+    final CreateBillController createBillController;
+    private static String librarianUsername;
 
     public BillView() {
         books = FXCollections.observableArrayList();
         createBillController = new CreateBillController();
     }
 
-    public void setLibrarianUsername(String username) {
-        this.librarianUsername = username;
+    public static void setLibrarianUsername(String username) {
+        librarianUsername = username;
     }
 
-    public void main(String[] args) {
+    public static void main(String[] args) {
         setLibrarianUsername("Librarian2");
         launch(args);
     }
@@ -95,7 +95,7 @@ public class BillView extends Application {
         TableColumn<Book, Double> totalPriceColumn = new TableColumn<>("Total Price");
         totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
 
-        bookTableView.getColumns().addAll(titleColumn, quantityColumn, totalPriceColumn);
+        bookTableView.getColumns().addAll(Arrays.asList(titleColumn, quantityColumn, totalPriceColumn));
         bookTableView.setItems(books);
 
         grid.add(bookTableView, 0, 11, 3, 1);
