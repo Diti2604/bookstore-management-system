@@ -56,10 +56,8 @@ public class MainDashboardView extends Application {
             launchDashboard(primaryStage);
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
             showErrorDialog("Database Driver Error", "MySQL JDBC Driver not found.");
         } catch (SQLException e) {
-            e.printStackTrace();
             showErrorDialog("Database Connection Error", "Failed to connect to the database.");
         }
     }
@@ -142,7 +140,7 @@ public class MainDashboardView extends Application {
                     case "Create Bill":
                         System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
                         BillView billView = new BillView();
-                        billView.setLibrarianUsername(librarianUsername);
+                        BillView.setLibrarianUsername(librarianUsername);
                         billView.start(newStage);
                         break;
                     case "Add Book":
@@ -395,7 +393,6 @@ private Button createComboBoxButton(String text) {
             stmt.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();
             showErrorDialog("Database Error", "Failed to fetch books from database.");
         }
 
@@ -431,7 +428,6 @@ private Button createComboBoxButton(String text) {
             }
         } catch (Exception e) {
             System.out.println("Error loading image for book: " + title);
-            e.printStackTrace();
         }
 
         // Book Information Labels
@@ -465,7 +461,7 @@ private Button createComboBoxButton(String text) {
                 conn.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getErrorCode());
         }
     }
 }
