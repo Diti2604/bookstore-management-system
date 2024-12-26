@@ -24,8 +24,22 @@ public class AddBookController {
             System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
+    public AddBookController(Connection conn) {
+        this.conn = conn;
+    }
     public void saveBook(Book book) {
+
+
+        if(book.getSellingPrice()<0){
+            System.err.println("Selling price is negative");
+            return;
+        }
+        if (book.getSellingPrice()>100000) {
+            System.err.println("Selling price is too high 100000");
+            return;
+        }
         System.out.println("Saving book to database: " + book.getTitle());
+
 
         try {
             String checkBookSQL = "SELECT stock FROM books WHERE title = ?";

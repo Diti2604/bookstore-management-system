@@ -62,6 +62,9 @@ public class Book {
         this.stock = stock;
         this.coverImageUrl = coverImageUrl;
     }
+    public Book(Double sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
 
 
     public String getISBN() {
