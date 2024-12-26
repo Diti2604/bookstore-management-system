@@ -16,7 +16,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class CheckLibrarianPerformanceView extends Application {
@@ -24,7 +23,7 @@ public class CheckLibrarianPerformanceView extends Application {
     private ComboBox<String> librarianComboBox;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
-    private CheckLibrarianPerformanceController controller = new CheckLibrarianPerformanceController();
+    final CheckLibrarianPerformanceController controller = new CheckLibrarianPerformanceController();
 
     public static void main(String[] args) {
         launch(args);
