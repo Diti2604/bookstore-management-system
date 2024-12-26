@@ -32,13 +32,13 @@ public class AddBookView extends Application {
     private TextField isbnField;
     private TextField authorField;
     private TextField sellingPriceField;
-    private Button submitButton;
+    Button submitButton;
     private Button chooseImageButton;
     private AddBookController addBookController;
     private String imageUrl;
     private ComboBox<String> categoryComboBox;
 
-    private Button searchButton;
+    Button searchButton;
 
     private static final String ISBN_REGEX = "\\d{4}-\\d{2}-\\d{4}";
     private static final String AUTHOR_REGEX = "^[a-zA-Z\\s]+$";
@@ -163,7 +163,7 @@ public class AddBookView extends Application {
         String category = categoryComboBox.getValue();
         String isbn = isbnField.getText();
         String author = authorField.getText();
-        double sellingPrice = 0.0;
+        double sellingPrice;
         try {
             sellingPrice = Double.parseDouble(sellingPriceField.getText());
         } catch (NumberFormatException e) {
