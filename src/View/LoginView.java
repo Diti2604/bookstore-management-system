@@ -16,6 +16,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class LoginView extends Application {
     private LoginController loginController;
 
@@ -27,7 +29,7 @@ public class LoginView extends Application {
     public void start(Stage stage) {
         loginController = new LoginController();
 
-        Image image = new Image(getClass().getResource("/Assets/loginPicture.jpg").toExternalForm());
+        Image image = new Image(Objects.requireNonNull(getClass().getResource("/Assets/loginPicture.jpg")).toExternalForm());
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
 
