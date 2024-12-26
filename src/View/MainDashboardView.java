@@ -177,7 +177,7 @@ public class MainDashboardView extends Application {
 
         actionComboBox.setCellFactory(param -> new ListCell<Button>() {
             @Override
-            protected void updateItem(Button item, boolean empty) {
+            public void updateItem(Button item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
                     setText(item.getText());
