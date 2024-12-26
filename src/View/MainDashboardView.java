@@ -134,42 +134,41 @@ public class MainDashboardView extends Application {
             if (selectedButton != null) {
                 Stage newStage = new Stage();
                 newStage.initModality(Modality.APPLICATION_MODAL);
-                 newStage.initOwner(primaryStage);
+                newStage.initOwner(primaryStage);
 
-                switch (selectedButton.getText()) {
-                    case "Create Bill":
-                        System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
-                        BillView billView = new BillView();
-                        BillView.setLibrarianUsername(librarianUsername);
-                        billView.start(newStage);
-                        break;
-                    case "Add Book":
-                        System.out.println("Opening Add Book Section");
-                        AddBookView addBookView = new AddBookView();
-                        addBookView.start(newStage);
-                        break;
-                    case "Check Librarian Performance":
-                        System.out.println("Opening Check Librarian Performance Section");
-                        CheckLibrarianPerformanceView checkLibrarianPerformanceView = new CheckLibrarianPerformanceView();
-                        checkLibrarianPerformanceView.start(newStage);
-                        break;
-                    case "Book Statistics":
-                        System.out.println("Opening Book Statistics Section");
-                        BookStatisticsView bookStatisticsView = new BookStatisticsView();
-                        bookStatisticsView.start(newStage);
-                        break;
-                    case "Manage Employees":
-                        System.out.println("Opening Manage Employees Section");
-                        ManageEmployeesView manageEmployeesView = new ManageEmployeesView();
-                        manageEmployeesView.start(newStage);
-                        break;
-                    case "Total Cost":
-                        TotalCostView totalCostView = new TotalCostView();
-                        totalCostView.start(newStage);
-                        break;
+                String buttonText = selectedButton.getText();
+
+                if ("Create Bill".equals(buttonText)) {
+                    System.out.println("Creating BillView with librarianUsername: " + librarianUsername);
+                    BillView billView = new BillView();
+                    BillView.setLibrarianUsername(librarianUsername);
+                    billView.start(newStage);
+                } else if ("Add Book".equals(buttonText)) {
+                    System.out.println("Opening Add Book Section");
+                    AddBookView addBookView = new AddBookView();
+                    addBookView.start(newStage);
+                } else if ("Check Librarian Performance".equals(buttonText)) {
+                    System.out.println("Opening Check Librarian Performance Section");
+                    CheckLibrarianPerformanceView checkLibrarianPerformanceView = new CheckLibrarianPerformanceView();
+                    checkLibrarianPerformanceView.start(newStage);
+                } else if ("Book Statistics".equals(buttonText)) {
+                    System.out.println("Opening Book Statistics Section");
+                    BookStatisticsView bookStatisticsView = new BookStatisticsView();
+                    bookStatisticsView.start(newStage);
+                } else if ("Manage Employees".equals(buttonText)) {
+                    System.out.println("Opening Manage Employees Section");
+                    ManageEmployeesView manageEmployeesView = new ManageEmployeesView();
+                    manageEmployeesView.start(newStage);
+                } else if ("Total Cost".equals(buttonText)) {
+                    System.out.println("Opening Total Cost Section");
+                    TotalCostView totalCostView = new TotalCostView();
+                    totalCostView.start(newStage);
+                } else {
+                    System.out.println("Unrecognized action: " + buttonText);
                 }
             }
         });
+
 
         bookContainer = new VBox();
         bookContainer.setAlignment(Pos.TOP_CENTER);
