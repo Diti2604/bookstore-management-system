@@ -56,15 +56,22 @@ public class CheckLibrarianPerformanceController {
 
         return librarianUsernames;
     }
-
     public List<String> fetchLibrarianSalesData(String librarianUsername, LocalDate startDate, LocalDate endDate) {
+        // Initial null check
         if (librarianUsername == null && startDate == null && endDate == null) {
             throw new IllegalArgumentException("Inputs cannot be null");
         }
+
+        if(librarianUsername == null){
+            throw new IllegalArgumentException("Librarian cannot be null");
+        }
+
+        // Date null checks
         if (startDate == null || endDate == null) {
             throw new IllegalArgumentException("Dates cannot be null");
         }
 
+        // Date range validation
         if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date cannot be after end date");
         }
@@ -90,19 +97,18 @@ public class CheckLibrarianPerformanceController {
                 double totalPrice = rs.getDouble("total_price");
                 LocalDate createdAt = rs.getDate("created_at").toLocalDate();
 
-                String salesRecord = "Book Title: " + bookTitle + ", Quantity Sold: " + quantity +
-                        ", Total Price: $" + totalPrice + ", Sale Date: " + createdAt;
+                String salesRecord = String.format("Book Title: %s, Quantity Sold: %d, Total Price: $%.2f, Sale Date: %s",
+                        bookTitle, quantity, totalPrice, createdAt);
                 salesData.add(salesRecord);
             }
-
         } catch (SQLException e) {
-            System.out.println("Error fetching librarians:");
+            System.err.println("Error fetching sales data: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
                 if (pstmt != null) pstmt.close();
             } catch (SQLException e) {
-                System.out.println("Error fetching librarians:");
+                System.err.println("Error closing resources: " + e.getMessage());
             }
         }
 

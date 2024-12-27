@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class CheckLibrarianPerformanceControllerEQ {
+public class fetchLibrarianSalesDataEQ {
 //    INVALID                       VALID                                 INVALID
 //    NOT A CORRECT LIBRARIAN      CORRECT NAME, CORRECT DATE FORMAT   WRONG FORMAT OF DATE INPUT/OUTPUT (START > END)
 
