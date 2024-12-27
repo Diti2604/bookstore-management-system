@@ -1,8 +1,6 @@
 <component name="libraryTable">
-  <library name="mysql-connector-j-9.1">
-    <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../mysql-connector-j-9.1.0/mysql-connector-j-9.1.0" />
-    </CLASSES>
+  <library name="java1">
+    <CLASSES />
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../../mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/src/build/java" />
@@ -16,6 +14,5 @@
       <root url="file://$PROJECT_DIR$/../../mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/src/main/user-impl/java" />
       <root url="file://$PROJECT_DIR$/../../mysql-connector-j-9.1.0/mysql-connector-j-9.1.0/src/test/java" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../../mysql-connector-j-9.1.0/mysql-connector-j-9.1.0" recursive="false" />
   </library>
 </component>
