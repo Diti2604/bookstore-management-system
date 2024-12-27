@@ -24,6 +24,10 @@ public class CheckLibrarianPerformanceController {
         }
     }
 
+    public CheckLibrarianPerformanceController(Connection mockConnection) {
+        this.conn = mockConnection;
+    }
+
 
     public ObservableList<String> fetchLibrariansFromDatabase() {
         ObservableList<String> librarianUsernames = FXCollections.observableArrayList();
@@ -54,6 +58,17 @@ public class CheckLibrarianPerformanceController {
     }
 
     public List<String> fetchLibrarianSalesData(String librarianUsername, LocalDate startDate, LocalDate endDate) {
+        if (librarianUsername == null && startDate == null && endDate == null) {
+            throw new IllegalArgumentException("Inputs cannot be null");
+        }
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Dates cannot be null");
+        }
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Start date cannot be after end date");
+        }
+
         List<String> salesData = new ArrayList<>();
         PreparedStatement pstmt = null;
         ResultSet rs = null;
