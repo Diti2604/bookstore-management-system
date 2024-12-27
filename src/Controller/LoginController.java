@@ -12,12 +12,29 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.time.LocalDate;
 
+
 public class LoginController {
 
     private Connection conn;
 
+    public LoginController(Connection mockConnection) {
+        if (mockConnection != null) {
+            conn = mockConnection;  // Use mock connection for testing
+        } else {
+            try {
+                // Default connection setup for actual use
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                String url = "jdbc:mysql://localhost:3306/bookstore";
+                conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");
+            } catch (ClassNotFoundException | SQLException e) {
+                System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
+            }
+        }
+    }
+
     public LoginController() {
         try {
+            // Default connection setup for actual use
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3306/bookstore";
             conn = DriverManager.getConnection(url, "root", "IndritFerati2604!");

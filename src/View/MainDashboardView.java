@@ -25,7 +25,7 @@ import java.util.List;
 
 public class MainDashboardView extends Application {
     private String librarianUsername;
-    private Connection conn;
+    private static Connection conn;
     private String userRole;
     private VBox bookContainer = new VBox();
     private List<VBox> originalBooks;
@@ -37,7 +37,9 @@ public class MainDashboardView extends Application {
 
     public MainDashboardView() {
     }
-
+    public MainDashboardView(Connection conn) {
+        this.conn = conn; // Ensure conn is initialized properly
+    }
     public static void main(String[] args) {
         launch(args);
     }
@@ -62,7 +64,7 @@ public class MainDashboardView extends Application {
         }
     }
 
-    private void showErrorDialog(String title, String message) {
+    private static void showErrorDialog(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -99,7 +101,7 @@ public class MainDashboardView extends Application {
         searchBar.setPromptText("Search book");
 
         ComboBox<String> filterComboBox = new ComboBox<>();
-        filterComboBox.getItems().addAll("Sort", "Title", "Category", "Author");
+        filterComboBox.getItems().addAll("Sort", "Title", "Category", "Author", "Price");
         filterComboBox.setValue("Sort");
         filterComboBox.setStyle("-fx-font-size: 14pt; -fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2;");
 
@@ -241,9 +243,20 @@ public class MainDashboardView extends Application {
             updateBookContainer(originalBooks, "Title");
         });
 
-        hbox.getChildren().addAll(backButton ,refreshButton, searchBar, filterComboBox, actionComboBox);
+        hbox.getChildren().addAll(backButton, refreshButton, searchBar, filterComboBox, actionComboBox);
 
         vbox.getChildren().addAll(stackPane, hbox, scrollPane);
+
+        searchBar.setOnAction(event -> {
+            int price = Integer.parseInt(searchBar.getText().trim());
+            int bookCount = countBooksByPrice(price, "");
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Book Count");
+            alert.setHeaderText(null);
+            alert.setContentText("Number of books with price <= " + price + ": " + bookCount);
+            alert.showAndWait();
+        });
 
         Scene scene = new Scene(vbox, screenBounds.getWidth(), screenBounds.getHeight());
         primaryStage.setScene(scene);
@@ -259,14 +272,64 @@ public class MainDashboardView extends Application {
         });
     }
 
-private Button createComboBoxButton(String text) {
-    Button button = new Button(text);
-    button.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2; -fx-font-weight:bold");
-    button.setPrefHeight(38);
-    button.setMaxHeight(38);
-    button.setMinHeight(38);
-    return button;
-}
+
+    private Button createComboBoxButton(String text) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: transparent; -fx-border-color: green; -fx-border-radius: 10; -fx-border-width: 2; -fx-font-weight:bold");
+        button.setPrefHeight(38);
+        button.setMaxHeight(38);
+        button.setMinHeight(38);
+        return button;
+    }
+    public int countBooksByPrice(int price, String sortBy) {
+        int count = 0;
+        try {
+            String query = "SELECT COUNT(*) AS book_count FROM books WHERE selling_price <= ?";
+            if (sortBy.equals("Category")) {
+                query += " ORDER BY category";
+            } else if (sortBy.equals("Author")) {
+                query += " ORDER BY author";
+            } else {
+                query += " ORDER BY title";
+            }
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, price);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("book_count");
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            showErrorDialog("Database Error", "Failed to fetch book count from the database.");
+        }
+        return count;
+    }
+
+    public int getAvgPrice() {
+        int avgPrice = 0;
+        try {
+            System.out.println("Calling getAvgPrice()...");
+            String query = "SELECT AVG(selling_price) AS avg_price FROM books";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                avgPrice = rs.getInt("avg_price");
+            }
+            System.out.println("Avg price is: " + avgPrice);
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            showErrorDialog("Database Error", "Failed to fetch average price from the database.");
+        }
+        return avgPrice;
+    }
+
+
 
     private void performSearch(TextField searchBar, ComboBox<String> filterComboBox) {
         String searchText = searchBar.getText().trim();
@@ -342,12 +405,17 @@ private Button createComboBoxButton(String text) {
 
     private List<VBox> fetchBooksFromDatabase(String searchQuery, String sortBy) {
         List<VBox> bookBoxes = new ArrayList<>();
+        boolean isNumericSearch = searchQuery.matches("\\d+(\\.\\d+)?");
 
         try {
             String query = "SELECT * FROM books";
 
             if (!searchQuery.isEmpty()) {
-                query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
+                if (isNumericSearch) {
+                    query += " WHERE selling_price <= ?";
+                } else {
+                    query += " WHERE title LIKE ? OR author LIKE ? OR category LIKE ?";
+                }
             }
 
             switch (sortBy) {
@@ -360,6 +428,9 @@ private Button createComboBoxButton(String text) {
                 case "Category":
                     query += " ORDER BY category";
                     break;
+                case "Price":
+                    query += " ORDER BY selling_price";
+                    break;
                 default:
                     break;
             }
@@ -367,9 +438,13 @@ private Button createComboBoxButton(String text) {
             PreparedStatement stmt = conn.prepareStatement(query);
 
             if (!searchQuery.isEmpty()) {
-                stmt.setString(1, "%" + searchQuery + "%");
-                stmt.setString(2, "%" + searchQuery + "%");
-                stmt.setString(3, "%" + searchQuery + "%");
+                if (isNumericSearch) {
+                    stmt.setDouble(1, Double.parseDouble(searchQuery));
+                } else {
+                    stmt.setString(1, "%" + searchQuery + "%");
+                    stmt.setString(2, "%" + searchQuery + "%");
+                    stmt.setString(3, "%" + searchQuery + "%");
+                }
             }
 
             ResultSet rs = stmt.executeQuery();
