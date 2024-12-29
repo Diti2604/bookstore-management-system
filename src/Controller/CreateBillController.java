@@ -24,6 +24,9 @@ public class CreateBillController {
             System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
+    public CreateBillController(Connection conn) {
+        this.conn = conn;
+    }
 
     public Book getBookByISBN(String isbn) {
         try {
