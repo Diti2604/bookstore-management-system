@@ -129,7 +129,7 @@ public class ManageEmployeesView extends Application {
 
         Label roleLabel = new Label("Role:");
         ComboBox<String> roleComboBox = new ComboBox<>();
-        roleComboBox.getItems().addAll("manager", "administrator", "librarian");
+        roleComboBox.getItems().addAll("Manager", "Administrator", "Librarian");
 
         Button registerButton = new Button("Register");
 

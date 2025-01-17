@@ -88,6 +88,17 @@ public class User {
         return this.username;
     }
     public static String hashPassword(String password) {
+        if (password == null) {
+            throw new NullPointerException("Password cannot be null");
+        }
+
+        if (password.isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
+        if (!password.matches("[a-zA-Z0-9]+")) {
+            throw new IllegalArgumentException("Password must contain only letters and numbers");
+        }
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashedBytes = md.digest(password.getBytes());
