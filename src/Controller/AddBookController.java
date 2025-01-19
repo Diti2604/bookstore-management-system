@@ -29,7 +29,6 @@ public class AddBookController {
     }
     public void saveBook(Book book) {
 
-
         if(book.getSellingPrice()<0){
             System.err.println("Selling price is negative");
             return;

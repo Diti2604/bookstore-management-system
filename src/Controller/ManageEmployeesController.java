@@ -4,6 +4,7 @@ import javafx.scene.control.Alert;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,14 @@ public class ManageEmployeesController {
     }
 
     public boolean registerEmployee(User user) {
+        // Calculate the age from the birthday
+        int age = Period.between(user.getBirthday(), LocalDate.now()).getYears();
+
+        // Check if age is between 18 and 65
+        if (age < 18 || age > 65) {
+            showAlert("Invalid Age", "The age of the user must be between 18 and 65.");
+            return false; // Exit registration process if age is not valid
+        }
         if (isUsernameExists(user.getUsername())) {
             showAlert("Duplicate Username", "Username '" + user.getUsername() + "' already exists.");
             return false; // Exit registration process

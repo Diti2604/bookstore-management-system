@@ -43,7 +43,7 @@ public class LoginController {
         }
     }
 
-    // Validate login credentials (without hashing)
+
     public User validateCredentials(String username, String enteredPassword) {
         try {
             String query = "SELECT * FROM users WHERE username = ?";

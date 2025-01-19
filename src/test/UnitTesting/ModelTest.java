@@ -8,10 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ModelTest {
     @Test
     void testValidInputHashing() {
-        String password = "aSecureAndLongPassword12345012345";
+        String password = "password123";
         String hashedPassword = User.hashPassword(password);
         assertNotNull(hashedPassword);
         assertFalse(hashedPassword.isEmpty());
+        System.out.println(hashedPassword);
     }
 
     @Test

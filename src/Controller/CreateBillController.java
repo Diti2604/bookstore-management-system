@@ -69,6 +69,18 @@ public class CreateBillController {
         }
     }
     public void saveBillToDatabase(String librarianUsername, String title, int quantity, double totalPrice) {
+        if (librarianUsername == null || librarianUsername.isEmpty()) {
+            throw new IllegalArgumentException("Librarian username cannot be null or empty");
+        }
+        if (title == null || title.isEmpty()) {
+            throw new IllegalArgumentException("Book title cannot be null or empty");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        if (totalPrice <= 0) {
+            throw new IllegalArgumentException("Total price must be greater than 0");
+        }
         try {
             String query = "INSERT INTO bills (librarian_username, book_title, quantity, total_price, created_at) VALUES (?, ?, ?, ?, NOW())";
             PreparedStatement pstmt = conn.prepareStatement(query);
