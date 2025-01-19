@@ -20,6 +20,10 @@ public class BookStatisticsController {
             System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");        }
     }
 
+    public BookStatisticsController(Connection mockConnection) {
+        conn = mockConnection;
+    }
+
     public ObservableList<Book> getDailyStatistics() {
         String query = "SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
                 "FROM bills WHERE DATE(created_at) = CURDATE() GROUP BY book_title";
@@ -39,7 +43,7 @@ public class BookStatisticsController {
         return getStatistics(query);
     }
 
-    private ObservableList<Book> getStatistics(String query) {
+    public ObservableList<Book> getStatistics(String query) {
         ObservableList<Book> statistics = FXCollections.observableArrayList();
         try (PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {

@@ -1,6 +1,7 @@
 package test.UnitTesting;
 
 import Controller.AddBookController;
+import Controller.BookStatisticsController;
 import Controller.CheckLibrarianPerformanceController;
 import Controller.CreateBillController;
 import Model.Book;
@@ -26,6 +27,7 @@ public class ControllerTest {
     private AddBookController addBookController;
     private CreateBillController createBillController;
     private CheckLibrarianPerformanceController checkLibrarianPerformanceController;
+    private BookStatisticsController bookStatisticsController;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -39,6 +41,7 @@ public class ControllerTest {
         addBookController = new AddBookController(mockConnection);
         createBillController = new CreateBillController(mockConnection);
         checkLibrarianPerformanceController = new CheckLibrarianPerformanceController((mockConnection));
+        bookStatisticsController = new BookStatisticsController(mockConnection);
     }
 
 
@@ -307,6 +310,218 @@ public class ControllerTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(mockConnection).prepareStatement("SELECT username FROM users WHERE role = 'Librarian'");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, never()).next();
+    }
+
+    @Test
+    void testGetDailyStatisticsValidData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("book_title")).thenReturn("1984", "Harry Potter");
+        when(mockResultSet.getInt("total_quantity")).thenReturn(5, 10);
+        when(mockResultSet.getDouble("total_price")).thenReturn(100.0, 200.0);
+
+        ObservableList<Book> result = bookStatisticsController.getDailyStatistics();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        Book book1 = result.get(0);
+        assertEquals("1984", book1.getTitle());
+        assertEquals(5, book1.getStock());
+        assertEquals(100.0, book1.getSellingPrice());
+
+        Book book2 = result.get(1);
+        assertEquals("Harry Potter", book2.getTitle());
+        assertEquals(10, book2.getStock());
+        assertEquals(200.0, book2.getSellingPrice());
+
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE DATE(created_at) = CURDATE() GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+    }
+
+    @Test
+    void testGetDailyStatisticsNoData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(false);
+
+        ObservableList<Book> result = bookStatisticsController.getDailyStatistics();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE DATE(created_at) = CURDATE() GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetDailyStatisticsSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+
+        ObservableList<Book> result = bookStatisticsController.getDailyStatistics();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE DATE(created_at) = CURDATE() GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, never()).next();
+    }
+
+    @Test
+    void testGetMonthlyStatisticsValidData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("book_title")).thenReturn("1984", "Harry Potter");
+        when(mockResultSet.getInt("total_quantity")).thenReturn(5, 10);
+        when(mockResultSet.getDouble("total_price")).thenReturn(100.0, 200.0);
+        ObservableList<Book> result = bookStatisticsController.getMonthlyStatistics();
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        Book book1 = result.get(0);
+        assertEquals("1984", book1.getTitle());
+        assertEquals(5, book1.getStock());
+        assertEquals(100.0, book1.getSellingPrice());
+        Book book2 = result.get(1);
+        assertEquals("Harry Potter", book2.getTitle());
+        assertEquals(10, book2.getStock());
+        assertEquals(200.0, book2.getSellingPrice());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) " +
+                "GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+    }
+
+    @Test
+    void testGetMonthlyStatisticsNoData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(false);
+        ObservableList<Book> result = bookStatisticsController.getMonthlyStatistics();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) " +
+                "GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetMonthlyStatisticsSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        ObservableList<Book> result = bookStatisticsController.getMonthlyStatistics();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price " +
+                "FROM bills WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) " +
+                "GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, never()).next();
+    }
+
+    @Test
+    void testGetTotalStatisticsValidData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("book_title")).thenReturn("1984", "Harry Potter");
+        when(mockResultSet.getInt("total_quantity")).thenReturn(5, 10);
+        when(mockResultSet.getDouble("total_price")).thenReturn(100.0, 200.0);
+        ObservableList<Book> result = bookStatisticsController.getTotalStatistics();
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        Book book1 = result.get(0);
+        assertEquals("1984", book1.getTitle());
+        assertEquals(5, book1.getStock());
+        assertEquals(100.0, book1.getSellingPrice());
+        Book book2 = result.get(1);
+        assertEquals("Harry Potter", book2.getTitle());
+        assertEquals(10, book2.getStock());
+        assertEquals(200.0, book2.getSellingPrice());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+    }
+
+    @Test
+    void testGetTotalStatisticsNoData() throws SQLException {
+        when(mockResultSet.next()).thenReturn(false);
+        ObservableList<Book> result = bookStatisticsController.getTotalStatistics();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetTotalStatisticsSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        ObservableList<Book> result = bookStatisticsController.getTotalStatistics();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, never()).next();
+    }
+
+
+    @Test
+    void testGetStatisticsValidData() throws SQLException {
+        String query = "SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title";
+
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("book_title")).thenReturn("1984", "Harry Potter");
+        when(mockResultSet.getInt("total_quantity")).thenReturn(5, 10);
+        when(mockResultSet.getDouble("total_price")).thenReturn(100.0, 200.0);
+
+        ObservableList<Book> result = bookStatisticsController.getStatistics(query);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        Book book1 = result.get(0);
+        assertEquals("1984", book1.getTitle());
+        assertEquals(5, book1.getStock());
+        assertEquals(100.0, book1.getSellingPrice());
+
+        Book book2 = result.get(1);
+        assertEquals("Harry Potter", book2.getTitle());
+        assertEquals(10, book2.getStock());
+        assertEquals(200.0, book2.getSellingPrice());
+
+        verify(mockConnection).prepareStatement(query);
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+    }
+
+    @Test
+    void testGetStatisticsNoData() throws SQLException {
+        String query = "SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title";
+
+        when(mockResultSet.next()).thenReturn(false);
+
+        ObservableList<Book> result = bookStatisticsController.getStatistics(query);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(mockConnection).prepareStatement(query);
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetStatisticsSQLException() throws SQLException {
+        String query = "SELECT book_title, SUM(quantity) as total_quantity, SUM(total_price) as total_price FROM bills GROUP BY book_title";
+
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+
+        ObservableList<Book> result = bookStatisticsController.getStatistics(query);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(mockConnection).prepareStatement(query);
         verify(mockPreparedStatement).executeQuery();
         verify(mockResultSet, never()).next();
     }
