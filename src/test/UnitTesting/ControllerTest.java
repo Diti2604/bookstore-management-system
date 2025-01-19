@@ -13,14 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ControllerTest {
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
-    private AddBookController controller;
+    private AddBookController addBookController;
     private CreateBillController createBillController;
 
     @BeforeEach
@@ -32,7 +32,7 @@ public class ControllerTest {
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 
-        controller = new AddBookController(mockConnection);
+        addBookController = new AddBookController(mockConnection);
         createBillController = new CreateBillController(mockConnection);
     }
 
@@ -129,13 +129,12 @@ public class ControllerTest {
     }
 
 
-
     @Test
     void testGetAllISBNsOrderedByStockZeroISBN() throws SQLException {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
-        assert(isbns.isEmpty());
+        assert (isbns.isEmpty());
     }
 
     @Test
@@ -148,9 +147,9 @@ public class ControllerTest {
         when(mockResultSet.getString("ISBN")).thenReturn("9781-23-4567", "9780-45-1524", "9780-74-3273", "9781-50-3280", "9781-50-3290");
 
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
-        assert(isbns.size() == 6);
-        assert(isbns.get(0).equals("9781-23-4567"));
-        assert(isbns.get(5).equals("9781-50-3290"));
+        assert (isbns.size() == 6);
+        assert (isbns.get(0).equals("9781-23-4567"));
+        assert (isbns.get(5).equals("9781-50-3290"));
     }
 
     @Test
@@ -163,9 +162,9 @@ public class ControllerTest {
                 .thenReturn(true).thenReturn(true).thenReturn(true)
                 .thenReturn(true)
                 .thenReturn(false);
-        when(mockResultSet.getString("ISBN")).thenReturn("9781-23-4567", "9780-45-1524", "9780-74-3273", "9781-50-3280", "9781-50-3290","9780-31-6769", "9780-06-0850", "9780-54-7928", "9780-34-5339", "1234-56-7890");
+        when(mockResultSet.getString("ISBN")).thenReturn("9781-23-4567", "9780-45-1524", "9780-74-3273", "9781-50-3280", "9781-50-3290", "9780-31-6769", "9780-06-0850", "9780-54-7928", "9780-34-5339", "1234-56-7890");
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
-        assert(isbns.size() == 10);
+        assert (isbns.size() == 10);
     }
 
     @Test
@@ -173,6 +172,96 @@ public class ControllerTest {
         // Tested for a database connectivity error
         when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
-        assert(isbns.isEmpty());
+        assert (isbns.isEmpty());
     }
+    /*
+
+    THE TESTS HERE ARE PART OF THE ADD BOOK CONTROLLER CLASS
+
+     */
+
+
+    @Test
+    void testBookExistsByNameWithExistingBook() throws SQLException {
+        String title = "1984";
+
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+
+        boolean exists = addBookController.bookExistsByName(title);
+        assertTrue(exists);
+
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testBookExistsByNameWithNonExistingBook() throws SQLException {
+        String title = "1994";
+
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false);
+
+        boolean exists = addBookController.bookExistsByName(title);
+        assertFalse(exists);
+
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
+    @Test
+    void testBookExistsByNameWithEmptyTitle() throws SQLException {
+        String title = "";
+
+        boolean exists = addBookController.bookExistsByName(title);
+        assertFalse(exists);
+
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testGetBookByNameWhenBookExists() throws SQLException {
+        String title = "1984";
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getString("isbn")).thenReturn("9780-45-1524");
+        when(mockResultSet.getString("category")).thenReturn("Fiction");
+        when(mockResultSet.getString("author")).thenReturn("George Orwell");
+        when(mockResultSet.getDouble("selling_price")).thenReturn(15.99);
+
+        Book book = addBookController.getBookByName(title);
+        assertNotNull(book);
+        assertEquals("9780-45-1524", book.getISBN());
+        assertEquals("Fiction", book.getCategory());
+        assertEquals("George Orwell", book.getAuthor());
+        assertEquals(15.99, book.getSellingPrice());
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testGetBookByNameWhenBookDoesNotExist() throws SQLException {
+        String title = "1984";
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false);
+        Book book = addBookController.getBookByName(title);
+        assertNull(book);
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
+
+    @Test
+    void testGetBookByNameWhenTitleIsEmpty() throws SQLException {
+        String title = "";
+        Book book = addBookController.getBookByName(title);
+        assertNull(book);
+        verify(mockPreparedStatement).setString(1, title);
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
 }
