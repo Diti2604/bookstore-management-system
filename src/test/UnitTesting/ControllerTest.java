@@ -1,8 +1,11 @@
 package test.UnitTesting;
 
 import Controller.AddBookController;
+import Controller.CheckLibrarianPerformanceController;
 import Controller.CreateBillController;
 import Model.Book;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +25,7 @@ public class ControllerTest {
     private ResultSet mockResultSet;
     private AddBookController addBookController;
     private CreateBillController createBillController;
+    private CheckLibrarianPerformanceController checkLibrarianPerformanceController;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -34,6 +38,7 @@ public class ControllerTest {
 
         addBookController = new AddBookController(mockConnection);
         createBillController = new CreateBillController(mockConnection);
+        checkLibrarianPerformanceController = new CheckLibrarianPerformanceController((mockConnection));
     }
 
 
@@ -253,7 +258,6 @@ public class ControllerTest {
     }
 
 
-
     @Test
     void testGetBookByNameWhenTitleIsEmpty() throws SQLException {
         String title = "";
@@ -261,6 +265,50 @@ public class ControllerTest {
         assertNull(book);
         verify(mockPreparedStatement).setString(1, title);
         verify(mockPreparedStatement).executeQuery();
+    }
+
+    /*
+
+    THESE TESTS ARE FOR THE CHECK LIBRARIAN PERFORMANCE CONTROLLER CLASS
+
+     */
+
+    @Test
+    void testFetchLibrariansFromDatabase() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getString("username"))
+                .thenReturn("librarian1", "librarian2");
+        ObservableList<String> result = checkLibrarianPerformanceController.fetchLibrariansFromDatabase();
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.containsAll(FXCollections.observableArrayList("librarian1", "librarian2")));
+        verify(mockConnection).prepareStatement("SELECT username FROM users WHERE role = 'Librarian'");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+        verify(mockResultSet, times(2)).getString("username");
+    }
+
+    @Test
+    void testFetchLibrariansFromDatabaseWithNoLibrarians() throws SQLException {
+        when(mockResultSet.next()).thenReturn(false);
+        ObservableList<String> result = checkLibrarianPerformanceController.fetchLibrariansFromDatabase();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT username FROM users WHERE role = 'Librarian'");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+        verify(mockResultSet, never()).getString("username");
+    }
+
+    @Test
+    void testFetchLibrariansFromDatabaseSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        ObservableList<String> result = checkLibrarianPerformanceController.fetchLibrariansFromDatabase();
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(mockConnection).prepareStatement("SELECT username FROM users WHERE role = 'Librarian'");
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, never()).next();
     }
 
 
