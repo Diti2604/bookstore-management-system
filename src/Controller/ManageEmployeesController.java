@@ -24,6 +24,11 @@ public class ManageEmployeesController {
         }
     }
 
+    public ManageEmployeesController(Connection mockConnection) {
+        conn = mockConnection;
+    }
+
+
     public boolean registerEmployee(User user) {
         // Calculate the age from the birthday
         int age = Period.between(user.getBirthday(), LocalDate.now()).getYears();
@@ -96,6 +101,10 @@ public class ManageEmployeesController {
         return users;
     }
     public boolean updateUser(User user, String currentUsername) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
         String sql = "UPDATE users SET username = ?, password = ?, name = ?, " +
                 "birthday = ?, phone = ?, email = ?, salary = ?, role = ? " +
                 "WHERE username = ?";
@@ -117,7 +126,7 @@ public class ManageEmployeesController {
             return false;
         }
     }
-    private boolean isUsernameExists(String username) {
+    public boolean isUsernameExists(String username) {
         String sql = "SELECT COUNT(*) AS count FROM users WHERE username = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);

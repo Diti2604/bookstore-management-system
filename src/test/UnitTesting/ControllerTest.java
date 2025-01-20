@@ -1,19 +1,16 @@
 package test.UnitTesting;
 
-import Controller.AddBookController;
-import Controller.BookStatisticsController;
-import Controller.CheckLibrarianPerformanceController;
-import Controller.CreateBillController;
+import Controller.*;
 import Model.Book;
+import Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +25,7 @@ public class ControllerTest {
     private CreateBillController createBillController;
     private CheckLibrarianPerformanceController checkLibrarianPerformanceController;
     private BookStatisticsController bookStatisticsController;
+    private ManageEmployeesController manageEmployeesController;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -42,6 +40,7 @@ public class ControllerTest {
         createBillController = new CreateBillController(mockConnection);
         checkLibrarianPerformanceController = new CheckLibrarianPerformanceController((mockConnection));
         bookStatisticsController = new BookStatisticsController(mockConnection);
+        manageEmployeesController = new ManageEmployeesController(mockConnection);
     }
 
 
@@ -314,6 +313,13 @@ public class ControllerTest {
         verify(mockResultSet, never()).next();
     }
 
+
+    /*
+
+    THESE METHODS ARE FOR METHODS IN BOOK STATISTICS CONTROLLER
+
+     */
+
     @Test
     void testGetDailyStatisticsValidData() throws SQLException {
         when(mockResultSet.next()).thenReturn(true, true, false);
@@ -525,6 +531,224 @@ public class ControllerTest {
         verify(mockPreparedStatement).executeQuery();
         verify(mockResultSet, never()).next();
     }
+
+    /*
+
+    THESE TESTS ARE FOR MANAGE EMPLOYEES CONTROLLER CLASS
+
+     */
+
+//    @Test
+//    void testRegisterEmployee_ValidUser() throws SQLException {
+//        User validUser = new User("David", "david123", "David", LocalDate.now().minusYears(30), "0688567890", "David@example.com", 50000, "Librarian");
+//        when(manageEmployeesController.isUsernameExists(validUser.getUsername())).thenReturn(false);
+//        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+//        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+//        boolean result = manageEmployeesController.registerEmployee(validUser);
+//        assertTrue(result, "Valid user should be registered successfully.");
+//        verify(mockPreparedStatement).setString(1, validUser.getUsername());
+//        verify(mockPreparedStatement).setDate(4, Date.valueOf(validUser.getBirthday()));
+//        verify(mockPreparedStatement).executeUpdate();
+//    }
+//
+//
+//    @Test
+//    void testRegisterEmployee_InvalidAgeTooYoung() throws SQLException {
+//        User underageUser = new User("Ben", "ben123", "Ben", LocalDate.now().minusYears(16), "0694567890", "ben@example.com", 40000, "Manager");
+//        boolean result = manageEmployeesController.registerEmployee(underageUser);
+//        assertFalse(result, "User under 18 should not be registered.");
+//        verify(mockConnection, never()).prepareStatement(anyString());
+//    }
+//
+//    @Test
+//    void testRegisterEmployee_InvalidAgeTooOld() throws SQLException {
+//        User seniorUser = new User("Tom", "tom123", "Tom", LocalDate.now().minusYears(70), "0684567890", "tom@example.com", 30000, "Admin");
+//        boolean result = manageEmployeesController.registerEmployee(seniorUser);
+//        assertFalse(result, "User over 65 should not be registered.");
+//        verify(mockConnection, never()).prepareStatement(anyString());
+//    }
+//
+//    @Test
+//    void testRegisterEmployee_DuplicateUsername() throws SQLException {
+//        User duplicateUser = new User("David", "david123", "david", LocalDate.now().minusYears(35), "0684567890", "david@example.com", 45000, "Librarian");
+//        when(manageEmployeesController.isUsernameExists(duplicateUser.getUsername())).thenReturn(true);
+//        boolean result = manageEmployeesController.registerEmployee(duplicateUser);
+//        assertFalse(result, "Duplicate username should not allow registration.");
+//        verify(mockConnection, never()).prepareStatement(anyString());
+//    }
+//
+//    @Test
+//    void testRegisterEmployee_DatabaseError() throws SQLException {
+//        User validUser = new User("Brandon", "brandon123", "Brandon", LocalDate.now().minusYears(30), "0674567890", "brandon@example.com", 50000, "Admin");
+//        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
+//        boolean result = manageEmployeesController.registerEmployee(validUser);
+//        assertFalse(result, "Database error should result in registration failure.");
+//    }
+
+
+    @Test
+    void testDeleteUserSuccess() throws SQLException {
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        boolean result = manageEmployeesController.deleteUser("David");
+        assertTrue(result, "The user should be deleted successfully.");
+        verify(mockConnection).prepareStatement("DELETE FROM users WHERE username = ?");
+        verify(mockPreparedStatement).setString(1, "David");
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    void testDeleteUserFailure() throws SQLException {
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        boolean result = manageEmployeesController.deleteUser("Adam");
+        assertFalse(result, "The user should not be deleted because they do not exist.");
+        verify(mockConnection).prepareStatement("DELETE FROM users WHERE username = ?");
+        verify(mockPreparedStatement).setString(1, "Adam");
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    void testDeleteUser_SQLException() throws SQLException {
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
+        boolean result = manageEmployeesController.deleteUser("David");
+        assertFalse(result, "The user should not be deleted due to an exception.");
+        verify(mockConnection).prepareStatement("DELETE FROM users WHERE username = ?");
+    }
+
+//
+//    @Test
+//    void testGetUsersByRole() throws SQLException {
+//        when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
+//
+//        when(mockResultSet.getString("username")).thenReturn("user1");
+//        when(mockResultSet.getString("password")).thenReturn("pass1");
+//        when(mockResultSet.getString("name")).thenReturn("User1");
+//        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-02-02"));
+//        when(mockResultSet.getString("phone")).thenReturn("0687654321");
+//        when(mockResultSet.getString("email")).thenReturn("user2@example.com");
+//        when(mockResultSet.getDouble("salary")).thenReturn(55000.0);
+//
+//        when(mockResultSet.getString("username")).thenReturn("user2");
+//        when(mockResultSet.getString("password")).thenReturn("pass2");
+//        when(mockResultSet.getString("name")).thenReturn("User2");
+//        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-02-02"));
+//        when(mockResultSet.getString("phone")).thenReturn("0687654321");
+//        when(mockResultSet.getString("email")).thenReturn("user2@example.com");
+//        when(mockResultSet.getDouble("salary")).thenReturn(55000.0);
+//
+//        List<User> users = manageEmployeesController.getUsersByRole("librarian");
+//
+//        assertNotNull(users, "The list of users should not be null.");
+//        assertEquals(2, users.size(), "The list should contain 2 users.");
+//        assertEquals("user1", users.get(0).getUsername(), "The first user's username should be 'user1'.");
+//        assertEquals("user2", users.get(1).getUsername(), "The second user's username should be 'user2'.");
+//
+//        verify(mockConnection).prepareStatement("SELECT * FROM users WHERE role = ?");
+//        verify(mockPreparedStatement).setString(1, "librarian");
+//        verify(mockPreparedStatement).executeQuery();
+//    }
+
+    @Test
+    void testGetUsersByRoleNoUsers() throws SQLException {
+        when(mockResultSet.next()).thenReturn(false);
+        List<User> users = manageEmployeesController.getUsersByRole("librarian");
+        assertNotNull(users, "The list of users should not be null.");
+        assertTrue(users.isEmpty(), "The list of users should be empty.");
+        verify(mockConnection).prepareStatement("SELECT * FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "librarian");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testGetUsersByRoleSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        List<User> users = manageEmployeesController.getUsersByRole("Employee");
+        assertNotNull(users, "The list of users should not be null.");
+        assertTrue(users.isEmpty(), "The list of users should be empty due to an exception.");
+        verify(mockConnection).prepareStatement("SELECT * FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Employee");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
+//    @Test
+//    void testUpdateUserWithValidInput() throws SQLException {
+//
+//        User user = new User("newUser", "password123", "John Doe", LocalDate.of(1990, 5, 15), "1234567890", "email@example.com", 5000.0, "Librarian");
+//        String currentUsername = "oldUser";
+//        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+//        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+//        boolean result = manageEmployeesController.updateUser(user, currentUsername);
+//        assertTrue(result);
+//        verify(mockPreparedStatement).setString(1, user.getUsername());
+//        verify(mockPreparedStatement).setString(2, user.getPassword());
+//        verify(mockPreparedStatement).executeUpdate();
+//    }
+//
+//    @Test
+//    void testUpdateUserWithInvalidInput() throws SQLException {
+//        User user = new User("newUser", "", "John Doe", LocalDate.of(1990, 5, 15), "1234567890", "invalid_email", 5000.0, "Librarian");
+//        String currentUsername = "oldUser";
+//        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+//        boolean result = manageEmployeesController.updateUser(user, currentUsername);
+//        assertFalse(result);
+//    }
+//
+//    @Test
+//    void testUpdateUserWithNullFields() throws SQLException {
+//        User user = new User("newUser", "password123", "John Doe", null, null, null, 5000.0, "Librarian");
+//        String currentUsername = "oldUser";
+//        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+//        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+//        boolean result = manageEmployeesController.updateUser(user, currentUsername);
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    void testUpdateUserWithSQLException() throws SQLException {
+//        User user = new User("newUser", "password123", "John Doe", LocalDate.of(1990, 5, 15), "1234567890", "email@example.com", 5000.0, "Librarian");
+//        String currentUsername = "oldUser";
+//        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
+//        boolean result = manageEmployeesController.updateUser(user, currentUsername);
+//        assertFalse(result);
+//    }
+//
+
+    @Test
+    void testIsUsernameExistsWhenItDoesExist() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getInt("count")).thenReturn(1);
+        boolean result = manageEmployeesController.isUsernameExists("librarian1");
+        assertTrue(result, "Username should exist.");
+        verify(mockConnection).prepareStatement("SELECT COUNT(*) AS count FROM users WHERE username = ?");
+        verify(mockPreparedStatement).setString(1, "librarian1");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testIsUsernameExistWhenItDoesNotExist() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getInt("count")).thenReturn(0);
+        boolean result = manageEmployeesController.isUsernameExists("librarian50");
+        assertFalse(result, "Username should not exist.");
+        verify(mockConnection).prepareStatement("SELECT COUNT(*) AS count FROM users WHERE username = ?");
+        verify(mockPreparedStatement).setString(1, "librarian50");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testIsUsernameExistsSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        boolean result = manageEmployeesController.isUsernameExists("David");
+        assertFalse(result, "Method should return false when an exception occurs.");
+        verify(mockConnection).prepareStatement("SELECT COUNT(*) AS count FROM users WHERE username = ?");
+        verify(mockPreparedStatement).setString(1, "David");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
+
+
 
 
 }
