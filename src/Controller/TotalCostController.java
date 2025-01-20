@@ -93,7 +93,7 @@ public class TotalCostController {
         return totalBillCostWithTax - totalBillCost; // Only return tax amount
     }
 
-    private List<Double> getTotalBillCostsAddedOnDate(LocalDate date) {
+    public List<Double> getTotalBillCostsAddedOnDate(LocalDate date) {
         List<Double> totalCosts = new ArrayList<>();
         String sql = "SELECT total_price FROM bills WHERE DATE(created_at) = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -109,7 +109,10 @@ public class TotalCostController {
         return totalCosts;
     }
 
-    private List<Double> getTotalBillCostsAddedInRange(LocalDate startDate, LocalDate endDate) {
+    public List<Double> getTotalBillCostsAddedInRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("startDate cannot be after endDate.");
+        }
         List<Double> totalCosts = new ArrayList<>();
         String sql = "SELECT total_price FROM bills WHERE DATE(created_at) BETWEEN ? AND ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

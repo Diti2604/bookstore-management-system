@@ -5,7 +5,6 @@ import Model.Book;
 import Model.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +25,7 @@ public class ControllerTest {
     private CheckLibrarianPerformanceController checkLibrarianPerformanceController;
     private BookStatisticsController bookStatisticsController;
     private ManageEmployeesController manageEmployeesController;
+    private TotalCostController totalCostController;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -41,6 +41,7 @@ public class ControllerTest {
         checkLibrarianPerformanceController = new CheckLibrarianPerformanceController((mockConnection));
         bookStatisticsController = new BookStatisticsController(mockConnection);
         manageEmployeesController = new ManageEmployeesController(mockConnection);
+        totalCostController = new TotalCostController(mockConnection);
     }
 
 
@@ -746,7 +747,178 @@ public class ControllerTest {
         verify(mockPreparedStatement).executeQuery();
     }
 
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeYearly() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("salary")).thenReturn(50000.0, 60000.0);
 
+        double result = totalCostController.calculateSalaryByRoleAndTimeframe("Manager", "yearly");
+
+        assertEquals(110000.0, result, 0.01, "Total yearly salary should match the sum of salaries.");
+
+        verify(mockConnection).prepareStatement("SELECT salary FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Manager");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeMonthly() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("salary")).thenReturn(60000.0, 72000.0);
+
+        double result = totalCostController.calculateSalaryByRoleAndTimeframe("Manager", "monthly");
+
+        assertEquals(11000.0, result, 0.01, "Monthly salary should be total divided by 12.");
+        verify(mockConnection).prepareStatement("SELECT salary FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Manager");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeWeekly() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("salary")).thenReturn(52000.0, 78000.0);
+
+        double result = totalCostController.calculateSalaryByRoleAndTimeframe("Manager", "weekly");
+
+        assertEquals(2500.0, result, 0.01, "Weekly salary should be total divided by 52.");
+
+        verify(mockConnection).prepareStatement("SELECT salary FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Manager");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeDaily() throws SQLException {
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("salary")).thenReturn(36500.0, 36500.0);
+
+        double result = totalCostController.calculateSalaryByRoleAndTimeframe("Manager", "daily");
+
+        assertEquals(200.0, result, 0.01, "Daily salary should be the total divided by 365.");
+
+        verify(mockConnection).prepareStatement("SELECT salary FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Manager");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeInvalidTimeframe() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                totalCostController.calculateSalaryByRoleAndTimeframe("Admin", "hourly"));
+
+        assertEquals("Invalid timeframe specified", exception.getMessage());
+    }
+
+    @Test
+    void testCalculateSalaryByRoleAndTimeframeSQLException() throws SQLException {
+        when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException("Database error"));
+        double result = totalCostController.calculateSalaryByRoleAndTimeframe("Admin", "yearly");
+        assertEquals(0.0, result, "Should return 0.0 when a SQLException occurs.");
+        verify(mockConnection).prepareStatement("SELECT salary FROM users WHERE role = ?");
+        verify(mockPreparedStatement).setString(1, "Admin");
+        verify(mockPreparedStatement).executeQuery();
+    }
+
+
+    @Test
+    void testGetTotalBillCostsAddedOnDateNormalCase() throws SQLException {
+        LocalDate date = LocalDate.of(2025, 1, 18);
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("total_price")).thenReturn(150.0, 200.0);
+        List<Double> result = totalCostController.getTotalBillCostsAddedOnDate(date);
+        assertEquals(2, result.size(), "List should contain two total prices.");
+        assertTrue(result.contains(150.0), "List should contain 150.0.");
+        assertTrue(result.contains(200.0), "List should contain 200.0.");
+        verify(mockPreparedStatement).setDate(1, Date.valueOf(date));
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+        verify(mockResultSet, times(2)).getDouble("total_price");
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedOnDateEmptyResultSet() throws SQLException {
+        LocalDate date = LocalDate.of(2025, 1, 20);
+        when(mockResultSet.next()).thenReturn(false);
+        List<Double> result = totalCostController.getTotalBillCostsAddedOnDate(date);
+        assertTrue(result.isEmpty(), "List should be empty when no data is found.");
+        verify(mockPreparedStatement).setDate(1, Date.valueOf(date));
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedOnDateSQLException() throws SQLException {
+        LocalDate date = LocalDate.of(2025, 1, 20);
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Mock SQL error"));
+        List<Double> result = totalCostController.getTotalBillCostsAddedOnDate(date);
+        assertTrue(result.isEmpty(), "List should be empty when SQLException occurs.");
+        verify(mockConnection).prepareStatement(anyString());
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedInRangeValidRangeWithResults() throws SQLException {
+        LocalDate startDate = LocalDate.of(2025, 1, 1);
+        LocalDate endDate = LocalDate.of(2025, 1, 31);
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("total_price")).thenReturn(100.0, 200.0);
+        List<Double> result = totalCostController.getTotalBillCostsAddedInRange(startDate, endDate);
+        assertEquals(2, result.size(), "List should contain two total prices.");
+        assertTrue(result.contains(100.0), "List should contain 100.0.");
+        assertTrue(result.contains(200.0), "List should contain 200.0.");
+        verify(mockPreparedStatement).setDate(1, Date.valueOf(startDate));
+        verify(mockPreparedStatement).setDate(2, Date.valueOf(endDate));
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(3)).next();
+        verify(mockResultSet, times(2)).getDouble("total_price");
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedInRangeValidRangeNoResults() throws SQLException {
+        LocalDate startDate = LocalDate.of(2025, 1, 1);
+        LocalDate endDate = LocalDate.of(2025, 1, 31);
+        when(mockResultSet.next()).thenReturn(false);
+        List<Double> result = totalCostController.getTotalBillCostsAddedInRange(startDate, endDate);
+        assertTrue(result.isEmpty(), "List should be empty when no data is found.");
+        verify(mockPreparedStatement).setDate(1, Date.valueOf(startDate));
+        verify(mockPreparedStatement).setDate(2, Date.valueOf(endDate));
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet).next();
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedInRangeSingleDayRange() throws SQLException {
+        LocalDate singleDate = LocalDate.of(2025, 1, 15);
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getDouble("total_price")).thenReturn(250.0);
+        List<Double> result = totalCostController.getTotalBillCostsAddedInRange(singleDate, singleDate);
+        assertEquals(1, result.size(), "List should contain one total price.");
+        assertTrue(result.contains(250.0), "List should contain 250.0.");
+        verify(mockPreparedStatement).setDate(1, Date.valueOf(singleDate));
+        verify(mockPreparedStatement).setDate(2, Date.valueOf(singleDate));
+        verify(mockPreparedStatement).executeQuery();
+        verify(mockResultSet, times(2)).next();
+        verify(mockResultSet).getDouble("total_price");
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedInRangeInvalidDateRange() {
+        LocalDate startDate = LocalDate.of(2025, 1, 31);
+        LocalDate endDate = LocalDate.of(2025, 1, 1);
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> totalCostController.getTotalBillCostsAddedInRange(startDate, endDate));
+        assertEquals("startDate cannot be after endDate.", exception.getMessage());
+    }
+
+    @Test
+    void testGetTotalBillCostsAddedInRangeSQLException() throws SQLException {
+        LocalDate startDate = LocalDate.of(2025, 1, 1);
+        LocalDate endDate = LocalDate.of(2025, 1, 31);
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Mock SQL error"));
+        List<Double> result = totalCostController.getTotalBillCostsAddedInRange(startDate, endDate);
+        assertTrue(result.isEmpty(), "List should be empty when SQLException occurs.");
+        verify(mockConnection).prepareStatement(anyString());
+    }
 
 
 
