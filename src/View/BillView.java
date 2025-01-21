@@ -168,7 +168,7 @@ public class BillView extends Application {
         billStage.show();
     }
 
-    private void processAddedBooks() {
+    public void processAddedBooks() {
         for (Book book : books) {
             String title = book.getTitle();
             int quantity = book.getStock();
@@ -185,4 +185,5 @@ public class BillView extends Application {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }

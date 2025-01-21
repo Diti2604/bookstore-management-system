@@ -6,11 +6,9 @@ import Model.User;
 import View.MainDashboardView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -19,7 +17,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 public class ControllerTest {
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;

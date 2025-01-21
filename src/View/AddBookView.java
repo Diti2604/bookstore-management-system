@@ -49,6 +49,13 @@ public class AddBookView extends Application {
             "Young Adult", "Fiction","Children's Books", "Poetry","Satire", "Drama/Plays","Adventure"
     );
 
+    public AddBookView(BillView billView, List<Book> mockBooks) {
+    }
+
+    public AddBookView() {
+
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -192,11 +199,11 @@ public class AddBookView extends Application {
         showAlert(Alert.AlertType.INFORMATION, "Success", "Book Saved", "Book saved successfully and fields cleared.");
     }
 
-    private boolean validateISBN(String isbn) {
+    public boolean validateISBN(String isbn) {
         return isbn.matches(ISBN_REGEX);
     }
 
-    private boolean validateAuthor(String author) {
+    public boolean validateAuthor(String author) {
         return author.matches(AUTHOR_REGEX);
     }
 

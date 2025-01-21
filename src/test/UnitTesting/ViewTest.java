@@ -1,70 +1,102 @@
 package test.UnitTesting;
 
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.stage.Stage;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import Controller.CreateBillController;
+import Model.Book;
+import View.AddBookView;
+import View.BillView;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.ApplicationTest;
 
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.testfx.assertions.api.Assertions.assertThat;
+public class ViewTest {
+    private AddBookView addBookView;
+    private CreateBillController createBillControllerMock;
+    private BillView billView;
+    private List<Book> books;
+    private String librarianUsername = "librarian123";
 
-@ExtendWith(ApplicationExtension.class)
-public class ViewTest extends ApplicationTest {
-    private ComboBox<String> isbnComboBox;
-    private TextField quantityField;
-    private Button loadBookButton;
+    @BeforeEach
+    void setUp() {
+        addBookView = new AddBookView();
+        books = new ArrayList<>();
+        Connection connectionMock = mock(Connection.class);
+        createBillControllerMock = spy(new CreateBillController(connectionMock));
+        billView = new BillView();
+        BillView.setLibrarianUsername(librarianUsername);
 
-    @Override
-    public void start(Stage stage) {
-        // Initialize the ComboBox with ISBN options
-        ComboBox<String> comboBox = new ComboBox<>();
-        comboBox.getItems().addAll("ISBN1", "ISBN2");
-
-        // Initialize the quantity field (starting disabled)
-        quantityField = new TextField();
-        quantityField.setDisable(true); // Initially disabled
-
-        // Initialize the button
-        loadBookButton = new Button("Load Book Info");
-
-        // Set an action for the button click to enable the quantity field
-        loadBookButton.setOnAction(e -> quantityField.setDisable(false)); // Enable quantity field on button click
-
-        // Create a simple layout and add the controls
-        Scene scene = new Scene(comboBox);
-        scene.setRoot(new javafx.scene.layout.VBox(comboBox, loadBookButton, quantityField));
-
-        stage.setScene(scene);
-        stage.show();
-
-        // Assign references to the fields
-        isbnComboBox = comboBox;
     }
 
     @Test
-    public void should_select_isbn_from_combobox() {
-        // Simulate user selecting an ISBN from the ComboBox
-        interact(() -> isbnComboBox.getSelectionModel().select(0));
-
-        // Verify that the ComboBox has the correct selection
-        assertThat(isbnComboBox.getSelectionModel().getSelectedItem())
-                .isEqualTo("ISBN1");
+    void testValidateISBNValidFormat() {
+        assertTrue(addBookView.validateISBN("1234-56-7890"), "Valid ISBN format failed validation");
+        assertTrue(addBookView.validateISBN("5678-12-3456"), "Valid ISBN format failed validation");
     }
 
     @Test
-    public void should_enable_quantity_field_after_loading_book() {
-        // Simulate user selecting an ISBN
-        interact(() -> isbnComboBox.getSelectionModel().select(0)); // Select a valid index (0 or 1)
-
-        // Simulate clicking on the "Load Book Info" button
-        clickOn(loadBookButton);
-
-        // Verify that the quantity field is enabled
-        assertThat(quantityField.isDisabled()).isFalse();
+    void testValidateISBNInvalidFormat() {
+        assertFalse(addBookView.validateISBN("1234567890"), "Invalid ISBN format passed validation");
+        assertFalse(addBookView.validateISBN("123-45-6789"), "Invalid ISBN format passed validation");
+        assertFalse(addBookView.validateISBN("ABCD-56-7890"), "Invalid ISBN format passed validation");
+        assertFalse(addBookView.validateISBN("1234-567890"), "Invalid ISBN format passed validation");
     }
+
+    @Test
+    void testValidateISBNEmpty() {
+        assertFalse(addBookView.validateISBN(""), "Empty ISBN passed validation");
+    }
+
+
+    @Test
+    void testValidateAuthorValidNames() {
+        assertTrue(addBookView.validateAuthor("John Doe"), "Valid author name failed validation");
+        assertTrue(addBookView.validateAuthor("Alice"), "Valid author name failed validation");
+        assertTrue(addBookView.validateAuthor("Marie Curie"), "Valid author name failed validation");
+    }
+
+    @Test
+    void testValidateAuthorInvalidNames() {
+        assertFalse(addBookView.validateAuthor("John123"), "Invalid author name passed validation");
+        assertFalse(addBookView.validateAuthor("Jane_Doe"), "Invalid author name passed validation");
+        assertFalse(addBookView.validateAuthor("!@#$%^"), "Invalid author name passed validation");
+        assertFalse(addBookView.validateAuthor("John-Doe"), "Invalid author name passed validation");
+    }
+
+    @Test
+    void testValidateAuthorEmpty() {
+        assertFalse(addBookView.validateAuthor(""), "Empty author name passed validation");
+        assertThrows(NullPointerException.class, () -> addBookView.validateAuthor(null), "Null author name did not throw exception");
+    }
+
+
+    @Test
+    void testProcessAddedBooks() {
+        books.add(new Book("https://books.com", "1984", "FICTION", "2222-22-2222", "AUTHOR 1", 5));
+        books.add(new Book("https://books.com", "Harry Potter", "FICTION", "1111-11-1111", "AUTHOR 2", 3));
+        billView.processAddedBooks();
+        verify(createBillControllerMock).saveBillToDatabase(librarianUsername, "1984", 5, 25.0);
+        verify(createBillControllerMock).saveBillToDatabase(librarianUsername, "Harry Potter", 3, 9.0);
+    }
+
+    @Test
+    void testProcessAddedBooksEmptyList() {
+        billView.processAddedBooks();
+        verify(createBillControllerMock, never()).saveBillToDatabase(anyString(), anyString(), anyInt(), anyDouble());
+    }
+
+    @Test
+    void testProcessAddedBooksExceptionHandling() {
+        books.add(new Book("https://books.com", "Book A", "FICTION", "2222-22-2222", "AUTHOR 1", 5));
+        doThrow(new RuntimeException("Database error")).when(createBillControllerMock)
+                .saveBillToDatabase(anyString(), anyString(), anyInt(), anyDouble());
+        assertDoesNotThrow(() -> billView.processAddedBooks());
+        verify(createBillControllerMock).saveBillToDatabase(librarianUsername, "Book A", 5, 10.0);
+    }
+
+
 }
