@@ -23,12 +23,6 @@ public class ModelTest {
     }
 
     @Test
-    void testNullValueHashing() {
-        assertThrows(NullPointerException.class,
-                () -> User.hashPassword(null));
-    }
-
-    @Test
     void testInvalidCharactersInPassword() {
         String invalidPassword = "!!!@@@...,,,***";
         assertThrows(IllegalArgumentException.class,

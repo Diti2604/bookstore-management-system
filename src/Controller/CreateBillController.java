@@ -58,6 +58,9 @@ public class CreateBillController {
     }
 
     public void updateBookStock(String isbn, int newStock) {
+        if (newStock < 0) {
+            throw new IllegalArgumentException("Stock cannot be negative");
+        }
         try {
             String query = "UPDATE books SET stock = ? where ISBN = ?";
             PreparedStatement pstmt = conn.prepareStatement(query);

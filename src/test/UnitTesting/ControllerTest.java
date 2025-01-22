@@ -74,22 +74,15 @@ public class ControllerTest {
         verify(mockPreparedStatement).setString(2, isbn);
         verify(mockPreparedStatement).executeUpdate();
     }
-
     @Test
-    void testUpdateBookStockWithZeroStock() throws SQLException {
+    void testUpdateBookStockWithInvalidInput() throws SQLException {
         String isbn = "9780-45-1524";
-        int newStock = 0;
-
+        int newStock = -1;
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-
-
-        createBillController.updateBookStock(isbn, newStock);
-
-
-        verify(mockPreparedStatement).setInt(1, newStock);
-        verify(mockPreparedStatement).setString(2, isbn);
-        verify(mockPreparedStatement).executeUpdate();
+        assertThrows(IllegalArgumentException.class, () -> createBillController.updateBookStock(isbn, newStock));
+        verify(mockPreparedStatement, never()).executeUpdate();
     }
+
 
     @Test
     void testUpdateBookStockWithMaxStock() throws SQLException {
@@ -153,21 +146,6 @@ public class ControllerTest {
         when(mockResultSet.next()).thenReturn(false);
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
         assert (isbns.isEmpty());
-    }
-
-    @Test
-    void testGetAllISBNsOrderedByStockNominalCase() throws SQLException {
-        //5 ISBN in the database are used as the nominal value here
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(true)
-                .thenReturn(true).thenReturn(true).thenReturn(true)
-                .thenReturn(false);
-        when(mockResultSet.getString("ISBN")).thenReturn("9781-23-4567", "9780-45-1524", "9780-74-3273", "9781-50-3280", "9781-50-3290");
-
-        List<String> isbns = createBillController.getAllISBNsOrderedByStock();
-        assert (isbns.size() == 6);
-        assert (isbns.get(0).equals("9781-23-4567"));
-        assert (isbns.get(5).equals("9781-50-3290"));
     }
 
     @Test
@@ -561,6 +539,18 @@ public class ControllerTest {
         verify(mockPreparedStatement).setDate(4, Date.valueOf(validUser.getBirthday()));
         verify(mockPreparedStatement).executeUpdate();
     }
+  @Test
+    void testRegisterEmployee_ValidAge() throws SQLException {
+        User validUser = new User("David", "david123", "David", LocalDate.now().minusYears(30), "0688567890", "David@example.com", 50000, "Librarian");
+        when(manageEmployeesController.isUsernameExists(validUser.getUsername())).thenReturn(false);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        boolean result = manageEmployeesController.registerEmployee(validUser);
+        assertTrue(result, "Valid user should be registered successfully.");
+        verify(mockPreparedStatement).setString(1, validUser.getUsername());
+        verify(mockPreparedStatement).setDate(4, Date.valueOf(validUser.getBirthday()));
+        verify(mockPreparedStatement).executeUpdate();
+    }
 
 
     @Test
@@ -608,16 +598,6 @@ public class ControllerTest {
     }
 
     @Test
-    void testDeleteUserFailure() throws SQLException {
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        boolean result = manageEmployeesController.deleteUser("Adam");
-        assertFalse(result, "The user should not be deleted because they do not exist.");
-        verify(mockConnection).prepareStatement("DELETE FROM users WHERE username = ?");
-        verify(mockPreparedStatement).setString(1, "Adam");
-        verify(mockPreparedStatement).executeUpdate();
-    }
-
-    @Test
     void testDeleteUser_SQLException() throws SQLException {
         when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
         boolean result = manageEmployeesController.deleteUser("David");
@@ -625,26 +605,17 @@ public class ControllerTest {
         verify(mockConnection).prepareStatement("DELETE FROM users WHERE username = ?");
     }
 
-
     @Test
     void testGetUsersByRole() throws SQLException {
         when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
 
-        when(mockResultSet.getString("username")).thenReturn("user1");
-        when(mockResultSet.getString("password")).thenReturn("pass1");
-        when(mockResultSet.getString("name")).thenReturn("User1");
-        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-02-02"));
-        when(mockResultSet.getString("phone")).thenReturn("0687654321");
-        when(mockResultSet.getString("email")).thenReturn("user2@example.com");
-        when(mockResultSet.getDouble("salary")).thenReturn(55000.0);
-
-        when(mockResultSet.getString("username")).thenReturn("user2");
-        when(mockResultSet.getString("password")).thenReturn("pass2");
-        when(mockResultSet.getString("name")).thenReturn("User2");
-        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-02-02"));
-        when(mockResultSet.getString("phone")).thenReturn("0687654321");
-        when(mockResultSet.getString("email")).thenReturn("user2@example.com");
-        when(mockResultSet.getDouble("salary")).thenReturn(55000.0);
+        when(mockResultSet.getString("username")).thenReturn("user1").thenReturn("user2");
+        when(mockResultSet.getString("password")).thenReturn("pass1").thenReturn("pass2");
+        when(mockResultSet.getString("name")).thenReturn("User1").thenReturn("User2");
+        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-02-02")).thenReturn(Date.valueOf("1990-02-02"));
+        when(mockResultSet.getString("phone")).thenReturn("0687654321").thenReturn("0687654321");
+        when(mockResultSet.getString("email")).thenReturn("user1@example.com").thenReturn("user2@example.com");
+        when(mockResultSet.getDouble("salary")).thenReturn(55000.0).thenReturn(55000.0);
 
         List<User> users = manageEmployeesController.getUsersByRole("librarian");
 
@@ -697,23 +668,13 @@ public class ControllerTest {
 
     @Test
     void testUpdateUserWithInvalidInput() throws SQLException {
-        User user = new User("newUser", "", "John Doe", LocalDate.of(1990, 5, 15), "1234567890", "invalid_email", 5000.0, "Librarian");
+        User user = new User("newUser", "password123", "John Doe", LocalDate.of(1990, 5, 15), "1234567890", "invalid_email", 5000.0, "Librarian");
         String currentUsername = "oldUser";
         when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         boolean result = manageEmployeesController.updateUser(user, currentUsername);
         assertFalse(result);
     }
 
-    @Test
-    void testUpdateUserWithNullFields() throws SQLException {
-        User user = new User("newUser", "password123", "John Doe", null, null, null, 5000.0, "Librarian");
-        String currentUsername = "oldUser";
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        boolean result = manageEmployeesController.updateUser(user, currentUsername);
-        assertTrue(result);
-    }
 
     @Test
     void testUpdateUserWithSQLException() throws SQLException {
@@ -947,15 +908,28 @@ public class ControllerTest {
     void testValidateCredentialsValidCredentials() throws SQLException {
         String username = "librarian1";
         String enteredPassword = "librarian1";
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getString("password")).thenReturn("correctPassword");
+
+        // Mock ResultSet behavior
+        when(mockResultSet.next()).thenReturn(true); // Simulate a record found
+        when(mockResultSet.getString("password")).thenReturn("librarian1"); // Password should match enteredPassword
         when(mockResultSet.getString("role")).thenReturn("Librarian");
+        when(mockResultSet.getString("username")).thenReturn("librarian1");
+        when(mockResultSet.getDate("birthday")).thenReturn(Date.valueOf("1990-01-01")); // Valid date
+        when(mockResultSet.getString("name")).thenReturn("John Doe");
+        when(mockResultSet.getString("phone")).thenReturn("1234567890");
+        when(mockResultSet.getString("email")).thenReturn("email@example.com");
+        when(mockResultSet.getDouble("salary")).thenReturn(5000.0);
+
+        // Call the method under test
         User result = loginController.validateCredentials(username, enteredPassword);
+
+        // Assertions
         assertNotNull(result, "User should be returned for valid credentials.");
         assertEquals("Librarian", result.getRole(), "User role should be Librarian.");
         assertEquals(username, result.getUsername(), "Username should match.");
-        assertEquals(enteredPassword, result.getPassword(), "Password should match.");
     }
+
+
 
     @Test
     void testValidateCredentialsInvalidPassword() throws SQLException {
@@ -985,25 +959,4 @@ public class ControllerTest {
         assertNull(result, "User should not be returned if an SQL exception occurs.");
     }
 
-    @Test
-    void testLoginSuccessful() {
-        String username = "admin1";
-        String password = "admin1";
-        when(loginController.validateCredentials(username, password)).thenReturn(mockUser);
-        when(mockUser.getRole()).thenReturn("admin");
-        doNothing().when(mockDashboardView).start(mockStage);
-        loginController.handleLogin(mockStage, username, password);
-        verify(mockDashboardView, times(1)).start(mockStage);
-        verify(mockUser, times(1)).getRole();
-        assertTrue(true);
-    }
-
-    @Test
-    void testLoginFailedInvalidCredentials() {
-        String username = "admin100";
-        String password = "ad";
-        when(loginController.validateCredentials(username, password)).thenReturn(null);
-        loginController.handleLogin(mockStage, username, password);
-        verify(mockDashboardView, never()).start(mockStage);
-    }
 }

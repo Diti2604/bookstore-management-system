@@ -104,6 +104,9 @@ public class ManageEmployeesController {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be empty");
         }
+        if (!user.getPassword().matches("^[a-zA-Z0-9]+$")) {
+            throw new IllegalArgumentException("Password must contain only letters and numbers");
+        }
 
         String sql = "UPDATE users SET username = ?, password = ?, name = ?, " +
                 "birthday = ?, phone = ?, email = ?, salary = ?, role = ? " +
