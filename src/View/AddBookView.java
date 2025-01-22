@@ -77,6 +77,7 @@ public class AddBookView extends Application {
 
         Label pictureBookLabel = new Label("Book URL Picture: ");
         bookUrlField = new TextField();
+        bookUrlField.setId("bookUrlField");
         bookUrlField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 String pictureBookUrl = bookUrlField.getText();
@@ -92,6 +93,7 @@ public class AddBookView extends Application {
 
         Label bookNameLabel = new Label("Book Name: ");
         bookNameField = new TextField();
+        bookNameField.setId("bookNameField");
         grid.add(bookNameLabel, 0, 1);
         grid.add(bookNameField, 1, 1);
 
@@ -102,22 +104,26 @@ public class AddBookView extends Application {
 
         Label categoryLabel = new Label("Category: ");
         categoryComboBox = new ComboBox<>(FXCollections.observableArrayList(bookCategories));
+        categoryComboBox.setId("categoryComboBox");
         categoryComboBox.setPromptText("Select Category");
         grid.add(categoryLabel, 0, 2);
         grid.add(categoryComboBox, 1, 2);
 
         Label isbnLabel = new Label("ISBN: ");
         isbnField = new TextField();
+        isbnField.setId("isbnField");
         grid.add(isbnLabel, 0, 3);
         grid.add(isbnField, 1, 3);
 
         Label authorLabel = new Label("Author: ");
         authorField = new TextField();
+        authorField.setId("authorField");
         grid.add(authorLabel, 0, 4);
         grid.add(authorField, 1, 4);
 
         Label sellingPriceLabel = new Label("Selling Price: ");
         sellingPriceField = new TextField();
+        sellingPriceField.setId("sellingPriceField");
         grid.add(sellingPriceLabel, 0, 5);
         grid.add(sellingPriceField, 1, 5);
 
@@ -129,6 +135,7 @@ public class AddBookView extends Application {
 
 
         submitButton = new Button("Create");
+        submitButton.setId("addBookButton");
         submitButton.setStyle("-fx-font-family: 'Times New Roman'; -fx-font-weight: bold; -fx-background-radius: 15; -fx-border-radius: 15;");
         grid.add(submitButton, 1, 10);
         submitButton.setOnAction(e -> handleSubmit());

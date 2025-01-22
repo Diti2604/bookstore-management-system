@@ -57,6 +57,7 @@ public class BookStatisticsView extends Application {
         tableTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
         statisticsTableView = new TableView<>();
+        statisticsTableView.setId("bookStatisticsTable");
         TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
@@ -73,9 +74,11 @@ public class BookStatisticsView extends Application {
         statisticsTableView.setPrefWidth(600);
 
         ComboBox<String> statisticsComboBox = new ComboBox<>();
+        statisticsComboBox.setId("statisticsComboBox");
         statisticsComboBox.getItems().addAll("Select Timeline", "Daily", "Monthly", "Total");
         statisticsComboBox.setValue("Select Timeline");
         statisticsComboBox.setPadding(new Insets(5));
+
 
         statisticsComboBox.setOnAction(event -> {
             String selectedTimeline = statisticsComboBox.getValue();

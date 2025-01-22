@@ -67,12 +67,14 @@ public class BillView extends Application {
         ComboBox<String> isbnComboBox = new ComboBox<>();
         List<String> isbns = createBillController.getAllISBNsOrderedByStock();
         isbnComboBox.setItems(FXCollections.observableArrayList(isbns));
+        isbnComboBox.setId("isbnComboBox");
 
         grid.add(isbnLabel, 0, 0);
         grid.add(isbnComboBox, 1, 0);
 
         Label quantityLabel = new Label("Quantity: ");
         TextField quantityField = new TextField("0");
+        quantityField.setId("quantityField");
         quantityField.setDisable(true);
         grid.add(quantityLabel, 0, 6);
         grid.add(quantityField, 1, 6);
@@ -86,6 +88,7 @@ public class BillView extends Application {
         grid.add(billNumberLabel, 0, 9, 2, 1);
 
         bookTableView = new TableView<>();
+        bookTableView.setId("bookTableView");
         TableColumn<Book, String> titleColumn = new TableColumn<>("Title");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
@@ -186,4 +189,7 @@ public class BillView extends Application {
         alert.showAndWait();
     }
 
+    public boolean isShowing() {
+        return true;
+    }
 }

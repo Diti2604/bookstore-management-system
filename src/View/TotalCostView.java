@@ -32,6 +32,7 @@ public class TotalCostView extends Application {
         timeframeComboBox = createTimeframeComboBox();
 
         Button calculateButton = new Button("Calculate Total Cost");
+        calculateButton.setId("calculateButton");
         calculateButton.setOnAction(event -> {
             String selectedTimeframe = timeframeComboBox.getValue();
 
@@ -70,7 +71,7 @@ public class TotalCostView extends Application {
 
     private TableView<CostItem> createTableView() {
         TableView<CostItem> tableView = new TableView<>();
-
+        tableView.setId("costTableView");
         TableColumn<CostItem, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
@@ -84,6 +85,7 @@ public class TotalCostView extends Application {
 
     private ComboBox<String> createTimeframeComboBox() {
         ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setId("timeframeComboBox");
         comboBox.getItems().addAll("Daily", "Weekly", "Monthly", "Yearly");
         comboBox.setValue("Daily");
         return comboBox;

@@ -50,12 +50,11 @@
     <orderEntry type="library" name="mockito.core" level="project" />
     <orderEntry type="library" name="java1" level="project" />
     <orderEntry type="library" name="mysql-connector-j-9.1" level="project" />
-    <orderEntry type="library" name="lib1" level="project" />
-    <orderEntry type="library" name="mysql-connector-j-9.1.0" level="project" />
-    <orderEntry type="library" name="lib2" level="project" />
     <orderEntry type="library" name="testfx.core" level="project" />
     <orderEntry type="library" name="loadui.testFx" level="project" />
     <orderEntry type="library" name="testfx.junit" level="project" />
     <orderEntry type="library" name="testfx.junit5" level="project" />
+    <orderEntry type="library" name="mockito.junit.jupiter" level="project" />
+    <orderEntry type="library" name="testfx.core1" level="project" />
   </component>
 </module>

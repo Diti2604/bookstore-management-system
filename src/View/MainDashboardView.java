@@ -121,6 +121,7 @@ public class MainDashboardView extends Application {
         addButton.setStyle("-fx-background-color:transparent;-fx-border-color:green;-fx-border-radius:10;-fx-border-width:2;");
 
         ComboBox<Button> actionComboBox = new ComboBox<>();
+        actionComboBox.setId("actionComboBox");
         actionComboBox.getItems().addAll(
                 createComboBoxButton("Create Bill"),
                 createComboBoxButton("Add Book"),
@@ -279,6 +280,7 @@ public class MainDashboardView extends Application {
         button.setPrefHeight(38);
         button.setMaxHeight(38);
         button.setMinHeight(38);
+        button.setId(text);
         return button;
     }
     public int countBooksByPrice(int price, String sortBy) {
