@@ -54,7 +54,7 @@ public class CheckLibrarianPerformanceView extends Application {
         ComboBox<String> librarianComboBox = new ComboBox<>();
         librarianComboBox.setStyle("-fx-font-size: 14px;");
         librarianComboBox.setPromptText("Select Librarian");
-
+        librarianComboBox.setId("librarianComboBox");
         ObservableList<String> librarianUsernames = controller.fetchLibrariansFromDatabase();
         librarianComboBox.setItems(librarianUsernames);
 
@@ -65,14 +65,16 @@ public class CheckLibrarianPerformanceView extends Application {
         DatePicker startDatePicker = new DatePicker();
         startDatePicker.setPromptText("Start Date");
         startDatePicker.setStyle("-fx-border-color: blue;");
+        startDatePicker.setId("startDatePicker");
 
         DatePicker endDatePicker = new DatePicker();
         endDatePicker.setPromptText("End Date");
         endDatePicker.setStyle("-fx-border-color: blue;");
-
+        endDatePicker.setId("endDatePicker");
         optionsBox.getChildren().addAll(librarianComboBox, startDatePicker, endDatePicker);
 
         Button showDataButton = new Button("Show Data");
+        showDataButton.setId("showDataButton");
         showDataButton.setStyle("-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;");
         VBox.setMargin(showDataButton, new Insets(10, 0, 10, 0));
         showDataButton.setOnAction(e -> {
@@ -87,6 +89,7 @@ public class CheckLibrarianPerformanceView extends Application {
         });
 
         dataLabel = new Label();
+        dataLabel.setId("salesDataLabel");
         dataLabel.setFont(Font.font("Arial", 14));
         dataLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: yellow;");
         VBox dataBox = new VBox(10);

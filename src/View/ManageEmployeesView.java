@@ -42,6 +42,7 @@ public class ManageEmployeesView extends Application {
 
         grid.add(actionLabel, 0, 0);
         ComboBox<String> actionComboBox = new ComboBox<>();
+        actionComboBox.setId("manageEmployeesComboBox");
         actionComboBox.getItems().addAll("Select", "Register", "Modify", "Delete");
         actionComboBox.setValue("Select");
         grid.add(actionComboBox, 1, 0);
@@ -61,6 +62,8 @@ public class ManageEmployeesView extends Application {
 
         managerComboBox.getItems().addAll(managers);
         librarianComboBox.getItems().addAll(librarians);
+        managerComboBox.setId("managerComboBox");
+        librarianComboBox.setId("librarianComboBox");
 
         grid.add(managerComboBox, 0, 2);
         grid.add(librarianComboBox, 1, 2);
@@ -108,30 +111,39 @@ public class ManageEmployeesView extends Application {
 
         Label usernameLabel = new Label("Username:");
         TextField usernameTextField = new TextField();
+        usernameTextField.setId("usernameTextField");
 
         Label passwordLabel = new Label("Password:");
         PasswordField passwordField = new PasswordField();
+        passwordField.setId("passwordField");
 
         Label nameLabel = new Label("Name:");
         TextField nameTextField = new TextField();
+        nameTextField.setId("nameTextField");
 
         Label birthdayLabel = new Label("Birthday:");
         DatePicker birthdayDatePicker = new DatePicker();
+        birthdayDatePicker.setId("birthdayDatePicker");
 
         Label phoneLabel = new Label("Phone:");
         TextField phoneTextField = new TextField();
+        phoneTextField.setId("phoneTextField");
 
         Label emailLabel = new Label("Email:");
         TextField emailTextField = new TextField();
+        emailTextField.setId("emailTextField");
 
         Label salaryLabel = new Label("Salary:");
         TextField salaryTextField = new TextField();
+        salaryTextField.setId("salaryTextField");
 
         Label roleLabel = new Label("Role:");
         ComboBox<String> roleComboBox = new ComboBox<>();
+        roleComboBox.setId("roleComboBox");
         roleComboBox.getItems().addAll("Manager", "Administrator", "Librarian");
 
         Button registerButton = new Button("Register");
+        registerButton.setId("registerButton");
 
         dataContainer.getChildren().addAll(
                 usernameLabel, usernameTextField,
@@ -201,10 +213,12 @@ public class ManageEmployeesView extends Application {
 
         Label selectionLabel = new Label("Select User:");
         ComboBox<User> userComboBox = new ComboBox<>();
+        userComboBox.setId("userComboBox");
         userComboBox.getItems().addAll(managerComboBox.getItems());
         userComboBox.getItems().addAll(librarianComboBox.getItems());
 
         Button fetchButton = new Button("Fetch User");
+        fetchButton.setId("fetchButton");
         dataContainer.getChildren().addAll(selectionLabel, userComboBox, fetchButton);
 
         fetchButton.setOnAction(e -> {
@@ -250,6 +264,11 @@ public class ManageEmployeesView extends Application {
                 newUsernameTextField.setText(selectedUser.getUsername());
 
                 Button updateButton = new Button("Update");
+
+
+                salaryTextField.setId("salaryTextField");
+                updateButton.setId("updateButton");
+
 
                 dataContainer.getChildren().addAll(
                         usernameLabel, usernameValueLabel,
@@ -323,10 +342,12 @@ public class ManageEmployeesView extends Application {
 
         Label selectionLabel = new Label("Select User:");
         ComboBox<User> userComboBox = new ComboBox<>();
+        userComboBox.setId("userComboBoxDelete");
         userComboBox.getItems().addAll(managerComboBox.getItems());
         userComboBox.getItems().addAll(librarianComboBox.getItems());
 
         Button deleteButton = new Button("Delete");
+        deleteButton.setId("deleteButton");
         dataContainer.getChildren().addAll(selectionLabel, userComboBox, deleteButton);
 
         deleteButton.setOnAction(e -> {
