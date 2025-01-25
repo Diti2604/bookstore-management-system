@@ -23,6 +23,9 @@ public class ManageEmployeesController {
             System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");
         }
     }
+    public ManageEmployeesController(Connection conn) {
+        this.conn = conn;
+    }
 
     public ManageEmployeesController(Connection mockConnection) {
         conn = mockConnection;

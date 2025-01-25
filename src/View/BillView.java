@@ -36,6 +36,10 @@ public class BillView extends Application {
         books = FXCollections.observableArrayList();
         createBillController = new CreateBillController();
     }
+    public BillView(CreateBillController createBillController) {
+        books = FXCollections.observableArrayList();
+        this.createBillController = createBillController;
+    }
 
     public static void setLibrarianUsername(String username) {
         librarianUsername = username;
@@ -116,6 +120,7 @@ public class BillView extends Application {
             }
         });
 
+
         Button addBookButton = new Button("Add Book");
         addBookButton.setOnAction(e -> {
             String isbn = isbnComboBox.getValue();
@@ -169,6 +174,20 @@ public class BillView extends Application {
         Scene scene = new Scene(root, rectangleWidth, rectangleHeight);
         billStage.setScene(scene);
         billStage.show();
+        totalLabel = new Label("Total Price: $" + totalPrice);
+        totalLabel.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
+        totalLabel.setId("totalLabel");  // Add this line
+
+        billNumberLabel = new Label("Bill Number: " + billNumber);
+        billNumberLabel.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
+        billNumberLabel.setId("billNumberLabel");  // Add this line
+
+        isbnComboBox.setId("isbnComboBox");
+        quantityField.setId("quantityField");
+        bookTableView.setId("bookTableView");
+        loadBookButton.setId("loadBookButton");
+        addBookButton.setId("addBookButton");
+        submitButton.setId("submitButton");
     }
 
     public void processAddedBooks() {
@@ -188,8 +207,13 @@ public class BillView extends Application {
         alert.setContentText(content);
         alert.showAndWait();
     }
+<<<<<<< Updated upstream
 
     public boolean isShowing() {
         return true;
+=======
+    public ObservableList<Book> getBooks(){
+        return books;
+>>>>>>> Stashed changes
     }
 }

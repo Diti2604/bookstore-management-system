@@ -34,10 +34,12 @@ public class LoginView extends Application {
         imageView.setPreserveRatio(true);
 
         TextField usernameTextField = new TextField();
+        usernameTextField.setId("usernameTextField");
         usernameTextField.setPromptText("Enter username");
         usernameTextField.setMaxWidth(200);
 
         PasswordField passwordField = new PasswordField();
+        passwordField.setId("passwordField");
         passwordField.setPromptText("Enter password");
         passwordField.setMaxWidth(200);
 

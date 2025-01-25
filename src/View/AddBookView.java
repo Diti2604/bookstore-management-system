@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AddBookView extends Application {
+    private static Stage pstage;
 
     private ImageView imageView;
     private TextField bookUrlField;
@@ -34,7 +35,7 @@ public class AddBookView extends Application {
     private TextField sellingPriceField;
     Button submitButton;
     private Button chooseImageButton;
-    private AddBookController addBookController;
+    public AddBookController addBookController;
     private String imageUrl;
     private ComboBox<String> categoryComboBox;
 
@@ -62,7 +63,8 @@ public class AddBookView extends Application {
 
     @Override
     public void start(Stage addBookStage) {
-        addBookStage.setTitle("Add Book");
+        pstage = addBookStage;
+        pstage.setTitle("Add Book");
 
         double rectangleWidth = 400;
         double rectangleHeight = 600;
@@ -152,8 +154,8 @@ public class AddBookView extends Application {
         root.setPrefSize(rectangleWidth, rectangleHeight);
 
         Scene scene = new Scene(root, rectangleWidth, rectangleHeight);
-        addBookStage.setScene(scene);
-        addBookStage.show();
+        pstage.setScene(scene);
+        pstage.show();
 
         addBookController = new AddBookController();
     }
@@ -250,10 +252,13 @@ public class AddBookView extends Application {
     }
 
         private void showAlert(Alert.AlertType alertType, String title, String headerText, String contentText) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        alert.showAndWait();
+            Alert alert = new Alert(alertType);
+            alert.setTitle(title);
+            alert.setHeaderText(headerText);
+            alert.setContentText(contentText);
+            alert.showAndWait();
+    }
+    public static Stage getPrimaryStage(){
+        return pstage;
     }
 }

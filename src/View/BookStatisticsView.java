@@ -27,6 +27,11 @@ public class BookStatisticsView extends Application {
     private TableView<Book> statisticsTableView;
     private BookStatisticsController statisticsController;
 
+    public BookStatisticsView(BookStatisticsController statisticsController) {
+        this.statisticsController = statisticsController;
+    }
+    public BookStatisticsView (){}
+
     @Override
     public void start(Stage stage) {
         statisticsController = new BookStatisticsController();
@@ -49,6 +54,7 @@ public class BookStatisticsView extends Application {
         stackPane.getChildren().addAll(headerRectangle, headerText);
 
         VBox statisticsBox = new VBox(10);
+        statisticsBox.setId("statisticsBox");
         statisticsBox.setAlignment(Pos.CENTER);
         statisticsBox.setPadding(new Insets(20));
         statisticsBox.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #c0c0c0; -fx-border-width: 1;");

@@ -19,6 +19,9 @@ public class BookStatisticsController {
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("No name for class com.mysql.cj.jdbc.Driver, or connection with db failed");        }
     }
+    public BookStatisticsController(Connection conn) {
+        this.conn = conn;
+    }
 
     public BookStatisticsController(Connection mockConnection) {
         conn = mockConnection;

@@ -27,6 +27,11 @@ public class ManageEmployeesView extends Application {
         launch(args);
     }
 
+    public ManageEmployeesView(ManageEmployeesController controller) {
+        this.controller = controller;
+    }
+    public ManageEmployeesView(){}
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Employee Management");
@@ -44,6 +49,7 @@ public class ManageEmployeesView extends Application {
         ComboBox<String> actionComboBox = new ComboBox<>();
         actionComboBox.setId("manageEmployeesComboBox");
         actionComboBox.getItems().addAll("Select", "Register", "Modify", "Delete");
+        actionComboBox.setId("actionComboBox");
         actionComboBox.setValue("Select");
         grid.add(actionComboBox, 1, 0);
 
@@ -96,6 +102,7 @@ public class ManageEmployeesView extends Application {
                 librarianComboBox.setVisible(false);
             }
         });
+
         primaryStage.show();
         centerStage(primaryStage);
     }
@@ -142,8 +149,22 @@ public class ManageEmployeesView extends Application {
         roleComboBox.setId("roleComboBox");
         roleComboBox.getItems().addAll("Manager", "Administrator", "Librarian");
 
+        usernameTextField.setId("usernameTextField");
+        passwordField.setId("passwordField");
+        nameTextField.setId("nameTextField");
+        birthdayDatePicker.setId("birthdayDatePicker");
+        phoneTextField.setId("phoneTextField");
+        emailTextField.setId("emailTextField");
+        salaryTextField.setId("salaryTextField");
+        roleComboBox.setId("roleComboBox");
+
+
         Button registerButton = new Button("Register");
         registerButton.setId("registerButton");
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 
         dataContainer.getChildren().addAll(
                 usernameLabel, usernameTextField,
@@ -156,6 +177,7 @@ public class ManageEmployeesView extends Application {
                 roleLabel, roleComboBox,
                 registerButton
         );
+
 
         registerButton.setOnAction(e -> {
             String username = usernameTextField.getText();
@@ -216,6 +238,7 @@ public class ManageEmployeesView extends Application {
         userComboBox.setId("userComboBox");
         userComboBox.getItems().addAll(managerComboBox.getItems());
         userComboBox.getItems().addAll(librarianComboBox.getItems());
+        userComboBox.setId("userComboBox");
 
         Button fetchButton = new Button("Fetch User");
         fetchButton.setId("fetchButton");
@@ -264,6 +287,7 @@ public class ManageEmployeesView extends Application {
                 newUsernameTextField.setText(selectedUser.getUsername());
 
                 Button updateButton = new Button("Update");
+                updateButton.setId("updateButton");
 
 
                 salaryTextField.setId("salaryTextField");
@@ -282,6 +306,15 @@ public class ManageEmployeesView extends Application {
                         newUsernameLabel, newUsernameTextField,
                         updateButton
                 );
+                usernameLabel.setId("usernameValueLabel");
+                passwordField.setId("passwordField");
+                nameTextField.setId("nameTextField");
+                birthdayDatePicker.setId("birthdayDatePicker");
+                phoneTextField.setId("phoneTextField");
+                emailTextField.setId("emailTextField");
+                salaryTextField.setId("salaryTextField");
+                roleComboBox.setId("roleComboBox");
+                newUsernameTextField.setId("newUsernameTextField");
 
                 updateButton.setOnAction(event -> {
                     String newUsername = newUsernameTextField.getText();
@@ -295,10 +328,6 @@ public class ManageEmployeesView extends Application {
 
                     if (!Pattern.matches("^[a-zA-Z0-9]+$", newPassword)) {
                         showAlert("Invalid Password", "Password should only contain letters and numbers.");
-                        return;
-                    }
-                    if (!Pattern.matches("^[a-zA-Z]+$", newName)) {
-                        showAlert("Invalid Name", "Name should only contain letters.");
                         return;
                     }
                     if (!Pattern.matches("^\\d{10}$", newPhone)) {
@@ -342,13 +371,18 @@ public class ManageEmployeesView extends Application {
 
         Label selectionLabel = new Label("Select User:");
         ComboBox<User> userComboBox = new ComboBox<>();
+<<<<<<< Updated upstream
         userComboBox.setId("userComboBoxDelete");
+=======
+        userComboBox.setId("userComboBox");
+>>>>>>> Stashed changes
         userComboBox.getItems().addAll(managerComboBox.getItems());
         userComboBox.getItems().addAll(librarianComboBox.getItems());
 
         Button deleteButton = new Button("Delete");
         deleteButton.setId("deleteButton");
         dataContainer.getChildren().addAll(selectionLabel, userComboBox, deleteButton);
+
 
         deleteButton.setOnAction(e -> {
             User selectedUser = userComboBox.getValue();

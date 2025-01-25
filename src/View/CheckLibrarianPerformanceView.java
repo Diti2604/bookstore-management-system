@@ -23,12 +23,18 @@ public class CheckLibrarianPerformanceView extends Application {
     private ComboBox<String> librarianComboBox;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
-    final CheckLibrarianPerformanceController controller = new CheckLibrarianPerformanceController();
+    final CheckLibrarianPerformanceController controller;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    public CheckLibrarianPerformanceView(CheckLibrarianPerformanceController controller) {
+        this.controller=controller;
+    }
+    public CheckLibrarianPerformanceView() {
+        this.controller=new CheckLibrarianPerformanceController();
+    }
     @Override
     public void start(Stage stage) {
         VBox root = new VBox();

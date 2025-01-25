@@ -23,17 +23,24 @@ public class TotalCostView extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    public TotalCostView(TotalCostController totalCostController) {
+        this.totalCostController = totalCostController;
+    }
+    public TotalCostView(){}
 
     @Override
     public void start(Stage stage) {
         totalCostController = new TotalCostController();
 
         tableView = createTableView();
+        tableView.setId("totalCostTable");
         timeframeComboBox = createTimeframeComboBox();
+        timeframeComboBox.setId("timeframeComboBox");
 
         Button calculateButton = new Button("Calculate Total Cost");
         calculateButton.setId("calculateButton");
         calculateButton.setOnAction(event -> {
+            try{
             String selectedTimeframe = timeframeComboBox.getValue();
 
             double totalAdminSalary = totalCostController.calculateSalaryByRoleAndTimeframe("Administrator", selectedTimeframe);
@@ -55,7 +62,9 @@ public class TotalCostView extends Application {
                     new CostItem("Total Overall Cost", totalCost)
             );
 
-            tableView.setItems(data);
+            tableView.setItems(data);}catch (IllegalArgumentException e){
+                System.out.println("Invalid Timeframe");
+            }
         });
 
 
